@@ -1,0 +1,29 @@
+<RCC>
+    <qresource prefix="/">
+        <file>pic/al/ap/0.png</file>
+        <file>pic/al/cc/0.png</file>
+        <file>pic/al/cc/1.png</file>
+        <file>pic/al/cc/2.png</file>
+        <file>pic/al/sh/0.png</file>
+        <file>pic/al/sh/1.png</file>
+        <file>pic/al/sh/2.png</file>
+        <file>pic/al/sh/3.png</file>
+        <file>pic/al/tn/0.png</file>
+        <file>pic/fr/ap/0.png</file>
+        <file>pic/fr/cc/0.png</file>
+        <file>pic/fr/cc/1.png</file>
+        <file>pic/fr/cc/2.png</file>
+        <file>pic/fr/sh/0.png</file>
+        <file>pic/fr/sh/1.png</file>
+        <file>pic/fr/sh/2.png</file>
+        <file>pic/fr/sh/3.png</file>
+        <file>pic/fr/tn/0.png</file>
+        <file>pic/al/cc/invert/0.png</file>
+        <file>pic/al/cc/invert/1.png</file>
+        <file>pic/al/cc/invert/2.png</file>
+        <file>pic/fr/cc/invert/0.png</file>
+        <file>pic/fr/cc/invert/1.png</file>
+        <file>pic/fr/cc/invert/2.png</file>
+        <file>map/invert/0.jpg</file>
+    </qresource>
+</RCC>
