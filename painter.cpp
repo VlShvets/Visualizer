@@ -256,8 +256,11 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
     p.scale(getCSAbsScale(), getCSOrdScale());
 
     /// Карта
-    QPixmap map(":/map/invert/0.jpg");
-    p.drawPixmap(QRect(- map.width() / 2.0 * 75.0 - 456125.0, - map.height() / 2.0 * 75.0 - 327075.0, map.width() * 75.0, map.height() * 75.0), map);
+    QPixmap map(":/map/0.jpg");
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(QRect(- map.width() / 2.0 * 75.0 - 456125.0, - map.height() / 2.0 * 75.0 + 327075.0, map.width() * 75.0, map.height() * 75.0), map);
+    p.restore();
 
     /// Координатные оси
     p.save();
@@ -270,38 +273,75 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
     /// Командные пункты
 
     QPixmap pic;
+    QRect rect;
 
     /// Свой командный пункт №1 (Ростов)
-    pic.load(":/pic/fr/cc/invert/0.png");
-    p.drawPixmap(QRect(CC_FR_1_X, CC_FR_1_Y, pic.width() / getCSAbsScale() / 2.0, pic.height() / -getCSOrdScale() / 2.0), pic);
-    pic.load(":/pic/fr/cc/invert/1.png");
-    p.drawPixmap(QRect(CC_FR_1_X, CC_FR_1_Y + pic.height() * 0.6 / -getCSOrdScale() / 2.0, pic.width() / getCSAbsScale() / 2.0, pic.height() / -getCSOrdScale() / 2.0), pic);
+    pic.load(":/pic/fr/cc/0.png");
+    rect.setRect(CC_FR_1_X, CC_FR_1_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
+    pic.load(":/pic/fr/cc/1.png");
+    rect.setRect(CC_FR_1_X, CC_FR_1_Y + 1.6 * pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
     /// Свой командный пункт №2 (Севастополь)
-    pic.load(":/pic/fr/cc/invert/0.png");
-    p.drawPixmap(QRect(CC_FR_2_X, CC_FR_2_Y, pic.width() / getCSAbsScale() / 2.0, pic.height() / -getCSOrdScale() / 2.0), pic);
-    pic.load(":/pic/fr/cc/invert/2.png");
-    p.drawPixmap(QRect(CC_FR_2_X, CC_FR_2_Y + pic.height() * 0.6 / -getCSOrdScale() / 2.0, pic.width() / getCSAbsScale() / 2.0, pic.height() / -getCSOrdScale() / 2.0), pic);
+    pic.load(":/pic/fr/cc/0.png");
+    rect.setRect(CC_FR_2_X, - CC_FR_2_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
+    pic.load(":/pic/fr/cc/2.png");
+    rect.setRect(CC_FR_2_X, - CC_FR_2_Y + 1.6 * pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
     /// Свой командный пункт №3 (Феодосия)
-    pic.load(":/pic/fr/cc/invert/2.png");
-    p.drawPixmap(QRect(CC_FR_3_X, CC_FR_3_Y, pic.width() / getCSAbsScale() / 2.0, pic.height() / -getCSOrdScale() / 2.0), pic);
+    pic.load(":/pic/fr/cc/2.png");
+    rect.setRect(CC_FR_3_X, - CC_FR_3_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
     /// Свой командный пункт №4 (Армянск)
-    pic.load(":/pic/fr/cc/invert/2.png");
-    p.drawPixmap(QRect(CC_FR_4_X, CC_FR_4_Y, pic.width() / getCSAbsScale() / 2.0, pic.height() / -getCSOrdScale() / 2.0), pic);
+    pic.load(":/pic/fr/cc/2.png");
+    rect.setRect(CC_FR_4_X, - CC_FR_4_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
     /// Чужой командный пункт №1
-    pic.load(":/pic/al/cc/invert/0.png");
-    p.drawPixmap(QRect(CC_AL_1_X, CC_AL_1_Y, pic.width() / getCSAbsScale() / 2.0, pic.height() / -getCSOrdScale() / 2.0), pic);
+    pic.load(":/pic/al/cc/0.png");
+    rect.setRect(CC_AL_1_X, - CC_AL_1_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
     /// Чужой командный пункт №2
     pic.load(":/pic/al/ap/0.png");
-    p.drawPixmap(QRect(CC_AL_2_X, CC_AL_2_Y, pic.width() / getCSAbsScale() / 2.0, pic.height() / -getCSOrdScale() / 2.0), pic);
+    rect.setRect(CC_AL_2_X - 0.5 * pic.width() / getCSAbsScale(), - CC_AL_2_Y + 0.5 * pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
     /// Чужой командный пункт №3
-    pic.load(":/pic/al/cc/invert/0.png");
-    p.drawPixmap(QRect(CC_AL_3_X, CC_AL_3_Y, pic.width() / getCSAbsScale() / 2.0, pic.height() / -getCSOrdScale() / 2.0), pic);
+    pic.load(":/pic/al/cc/0.png");
+    rect.setRect(CC_AL_3_X, - CC_AL_3_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
     /// Зоны видимости
 

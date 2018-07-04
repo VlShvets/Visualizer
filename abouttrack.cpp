@@ -39,7 +39,7 @@ AboutTrack::AboutTrack(QWidget *_parent) : QScrollArea(_parent)
 //    formLayout->addRow(QObject::tr("Индивидуальный номер ВО по RBS:"), &labelAT.lIndNumRBS);
 //    formLayout->addRow(QObject::tr("Индивидуальный номер ВО по Mk-XA/Mk-XII:"), &labelAT.lIndNumMK);
 
-    formLayout->addRow(QObject::tr("Единый номер ВО:"), &labelAT.lUniNum);
+    formLayout->addRow(QObject::tr("Единый номер объекта:"), &labelAT.lUniNum);
 
 //    formLayout->addRow(QObject::tr("Номер трассы в системе оповещения:"), &labelAT.lRSTrcNum);
 
@@ -62,8 +62,8 @@ AboutTrack::AboutTrack(QWidget *_parent) : QScrollArea(_parent)
 
     formLayout->addRow(QObject::tr("ОГП:"), &labelAT.lOGP);
 
-    formLayout->addRow(QObject::tr("Индекс воздушного объекта:"), &labelAT.lIVO);
-    formLayout->addRow(QObject::tr("Тип воздушного объекта:"), &labelAT.lTVO);
+    formLayout->addRow(QObject::tr("Индекс объекта:"), &labelAT.lIVO);
+    formLayout->addRow(QObject::tr("Тип объекта:"), &labelAT.lTVO);
     formLayout->addRow(QObject::tr("Количественный состав:"), &labelAT.lQuant);
 
 //    formLayout->addRow(QObject::tr("Признак воздействия ИА:"), &labelAT.lAttackStateFA);

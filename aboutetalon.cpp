@@ -27,8 +27,8 @@ AboutEtalon::AboutEtalon(QWidget *_parent) : QScrollArea(_parent)
 //    formLayout->addRow(QObject::tr("Запрет оповещения даннного эталона:"), &labelAE.lNoInform);
 
     formLayout->addRow(QObject::tr("Доверительный интервал:"), &labelAE.lTrustXY);
-    formLayout->addRow(QObject::tr("Индекс воздушного объекта"), &labelAE.lIVO);
-    formLayout->addRow(QObject::tr("Тип воздушного объекта"), &labelAE.lTVO);
+    formLayout->addRow(QObject::tr("Индекс объекта"), &labelAE.lIVO);
+    formLayout->addRow(QObject::tr("Тип объекта"), &labelAE.lTVO);
     formLayout->addRow(QObject::tr("Госпринадлежность объекта:"), &labelAE.lOGP);
     formLayout->addRow(QObject::tr("Наличие маневра:\n"
                                    "(Да - есть маневр)"), &labelAE.lManevr);
