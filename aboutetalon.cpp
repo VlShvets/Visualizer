@@ -113,13 +113,13 @@ void AboutEtalon::updateInfoAboutEtalon()
     labelAE.lX.setText(QString::number(tPubEtalon->x));
     labelAE.lY.setText(QString::number(tPubEtalon->y));
     labelAE.lH.setText(QString::number(tPubEtalon->h));
-    QString temp = QString::number(tPubEtalon->trcNumSens[0]);
-    for(int i = 1; tPubEtalon->trcNumSens[i] != -1.0 && i < GEN_SUM_VISUAL_VALUES; ++i)
+    QString temp = QString::number(tPubEtalon->trcNumSens[1]);
+    for(int i = 2; tPubEtalon->trcNumSens[i] != -1.0 && i < GEN_SUM_VISUAL_VALUES; ++i)
         temp += QString(",") + ((i % 10 == 0)?(QString("\n")):(QString(" "))) + QString::number(tPubEtalon->trcNumSens[i]);
     labelAE.lTrcNumSens.setText(temp);
     temp.clear();
-    temp = QString::number(tPubEtalon->sensImit[0]);
-    for(int i = 1; tPubEtalon->sensImit[i] != -1.0 && i < GEN_SUM_VISUAL_VALUES; ++i)
+    temp = QString::number(tPubEtalon->sensImit[1]);
+    for(int i = 2; tPubEtalon->sensImit[i] != -1.0 && i < GEN_SUM_VISUAL_VALUES; ++i)
         temp += QString(",") + ((i % 10 == 0)?(QString("\n")):(QString(" "))) + QString::number(tPubEtalon->sensImit[i]);
     labelAE.lSensImit.setText(temp);
     temp.clear();

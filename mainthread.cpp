@@ -19,8 +19,8 @@ void MainThread::run()
 
     TUTrcMsg Msg;   /// Результат Предварительной Обработки Информации
 
-    BIUS_A100::TWP aWP;                                                 /// Объект класса условной точки, относительно котороый вычисляются координаты
-    static TAir Air(aWP);                                               /// Объект класса Третичной Обработки Информации по воздушным объектам
+    // BIUS_A100::TWP aWP;                                                 /// Объект класса условной точки, относительно котороый вычисляются координаты
+    static TAir Air;                                                    /// Объект класса Третичной Обработки Информации по воздушным объектам
     static TSea Surface;                                                /// Объект класса Третичной Обработки Информации по поверхностным объектам
     PTPV_TGenTrcMsg pGenTrcMsg[2];                                      /// Результат Третичной Обработки Информации
     TUTrcMsg pOrderSP[2];                                               /// Распоряжения Третичной Обработки Информации
@@ -33,10 +33,10 @@ void MainThread::run()
 
     while(T < 10000.0)
     {
-        msleep(50.0);  /// 0.0500 c
-//        msleep(500.0);  /// 0.5000 c
- T = (double) clock() / CLOCKS_PER_SEC*10;
-//        T = (double) clock() / CLOCKS_PER_SEC;
+//        msleep(50.0);  /// 0.0500 c
+        msleep(500.0);  /// 0.5000 c
+//        T = (double) clock() / CLOCKS_PER_SEC * 10;
+        T = (double) clock() / CLOCKS_PER_SEC;
         std::cout << "T = " << T << std::endl;
 
         mainWindow->sendToTool(Time, T);
@@ -132,8 +132,8 @@ void MainThread::run()
         QApplication::postEvent(mainWindow, new TGenTrcEvent(pGenTrcAir));
         QApplication::postEvent(mainWindow, new TGenTrcEvent(pGenTrcSurface));
 
-        msleep(50.0);  /// 0.0500 c
-//        msleep(500.0);  /// 0.5000 c
+//        msleep(50.0);  /// 0.0500 c
+        msleep(500.0);  /// 0.5000 c
 
         /// Периодическая проверка состояний объектов
         if((int) T % 10 == 0)

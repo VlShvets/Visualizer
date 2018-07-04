@@ -204,8 +204,8 @@ void AboutTrack::updateInfoAboutTrack()
 
 //    labelAT.lRSTrcNum.setText(QString::number(tGenTrc->RSTrcNum));
 
-    QString temp = QString::number(tGenTrc->sensTrcNum[0]);
-    for(int i = 1; tGenTrc->sensTrcNum[i] != -1.0 && i < GEN_SUM_VISUAL_VALUES; ++i)
+    QString temp = QString::number(tGenTrc->sensTrcNum[1]);
+    for(int i = 2; tGenTrc->sensTrcNum[i] != -1.0 && i < GEN_SUM_VISUAL_VALUES; ++i)
         temp += QString(",") + ((i % 10 == 0)?(QString("\n")):(QString(" "))) + QString::number(tGenTrc->sensTrcNum[i]);
     labelAT.lSeneTrcNum.setText(temp);
     temp.clear();
