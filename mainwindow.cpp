@@ -1,67 +1,77 @@
-#include "MainWindow.h"
+#include "mainwindow.h"
 
-MainWindow::MainWindow()
+namespace Visualizer
 {
-#ifdef Q_OS_WIN         /// Widnows
+
+/// Класс виджета главного окна
+MainWindow::MainWindow(QWidget *_parent)
+    : QMainWindow(_parent)
+{
+
+#ifdef Q_OS_WIN             /// Windows     (Qt 5)
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("cp-1251"));
-#elif defined Q_OS_UNIX /// Linux
+#elif defined Q_OS_UNIX     /// Linux       (Qt 4)
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf-8"));
 #endif
 
-    aboutEtalon = new AboutEtalon;
-    QDockWidget *dAboutEtalon = new QDockWidget;
-    dAboutEtalon->setWidget(aboutEtalon);
-    dAboutEtalon->setMaximumHeight(400);
-    dAboutEtalon->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    dAboutEtalon->setFeatures(QDockWidget::AllDockWidgetFeatures);
-    addDockWidget(Qt::LeftDockWidgetArea, dAboutEtalon);
-    dAboutEtalon->setVisible(false);
+    setWindowTitle(tr("Визуализатор 2.0"));
 
-    aboutTrack = new AboutTrack;
-    QDockWidget *dAboutTrack = new QDockWidget;
+    aboutEtalon     = new AboutEtalon;
+    aboutTrack      = new AboutTrack;
+    graphHeight     = new GraphHeight;
+    painter         = new Painter(aboutEtalon, aboutTrack, graphHeight);
+    settings        = new Settings(painter);
+    status          = new Status;
+    playPause       = new PlayPause(painter, status);
+
+    /// Виджет отрисовки эталонов и трасс
+    setCentralWidget(painter);
+
+    /// Виджет управления потоком вычислений
+    QToolBar *tPlayPause = new QToolBar(tr("Управление потоком вычислений"), this);
+    tPlayPause->addWidget(playPause);
+    tPlayPause->setMovable(false);
+    addToolBar(tPlayPause);
+
+    /// Виджет настроек отображения
+    QToolBar *tSettings = new QToolBar(tr("Настройки"), this);
+    tSettings->addWidget(settings);
+    tSettings->setMovable(false);
+    addToolBar(tSettings);
+
+    /// Виджет отображения параметров эталонов
+    QDockWidget *dAboutEtalon = new QDockWidget(tr("Информация об эталоне"), this);
+    dAboutEtalon->setWidget(aboutEtalon);
+    dAboutEtalon->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, dAboutEtalon);
+
+    /// Виджет отображения параметров трасс
+    QDockWidget *dAboutTrack = new QDockWidget(tr("Информация о трассе"), this);
     dAboutTrack->setWidget(aboutTrack);
     dAboutTrack->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    dAboutTrack->setFeatures(QDockWidget::AllDockWidgetFeatures);
-    addDockWidget(Qt::LeftDockWidgetArea, dAboutTrack);
-    dAboutTrack->setVisible(false);
+    addDockWidget(Qt::RightDockWidgetArea, dAboutTrack);
 
-    graphHeight = new GraphHeight;
-    QDockWidget *dGraphHeight = new QDockWidget;
+    tabifyDockWidget(dAboutEtalon, dAboutTrack);
+
+    /// Виджет отображения графика высоты
+    QDockWidget *dGraphHeight = new QDockWidget(tr("График высоты"), this);
     dGraphHeight->setWidget(graphHeight);
     dGraphHeight->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    dGraphHeight->setFeatures(QDockWidget::AllDockWidgetFeatures);
-    dGraphHeight->setMinimumWidth(300);
     addDockWidget(Qt::RightDockWidgetArea, dGraphHeight);
-    dGraphHeight->setVisible(false);
 
-    painter = new Painter(dAboutEtalon, dAboutTrack, dGraphHeight);
-    this->setCentralWidget(painter);
-
-    tool = new Tool(painter);
-    QDockWidget *dTool = new QDockWidget;
-    dTool->setWidget(tool);
-    dTool->setAllowedAreas(Qt::AllDockWidgetAreas);
-    dTool->setFeatures(QDockWidget::DockWidgetMovable);
-    dTool->setMaximumHeight(100);
-    addDockWidget(Qt::TopDockWidgetArea, dTool);
+    /// Виджет отображения текущего состояния потока вычислений
+    statusBar()->addWidget(status);
 }
 
 MainWindow::~MainWindow()
 {
-    delete aboutEtalon;
-    delete aboutTrack;
-    delete graphHeight;
+    delete playPause;
+    delete status;
+    delete settings;
     delete painter;
-    delete tool;
+    delete graphHeight;
+    delete aboutTrack;
+    delete aboutEtalon;
 }
 
-void MainWindow::customEvent(QEvent *_event)
-{
-    if((int)_event->type() == TPubEtalonEvent::TPubEtalonType)
-        painter->setEtalons(((TPubEtalonEvent*)(_event))->getTPubEtalon(), ((TPubEtalonEvent*)(_event))->getTime());
-
-    if((int)_event->type() == TGenTrcEvent::TGenTrcType)
-        painter->setTracks(((TGenTrcEvent*)(_event))->getTGenTrc());
-
-    QWidget::customEvent(_event);
 }

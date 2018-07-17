@@ -1,16 +1,20 @@
 #ifndef TARGET_H
 #define TARGET_H
 
-#include <QPolygon>
+#include "IMIT_.h"
+#include "U_PTPV_.h"
 
 #include "define.h"
 
-#include "IMIT_.h"
-#include "U_PTPV_.h"
+#include <QPolygon>
 
 using namespace BIUS_A100::IMIT_;
 using namespace BIUS_A100::_PTPV_;
 
+namespace  Visualizer
+{
+
+/// Класс параметров целей
 class Target : public QPolygon
 {
 public:
@@ -67,6 +71,10 @@ protected:
     /// Установка символа Наземной Цели (GROUND)
     void setGROUND(float _x, float _y, float _alpha);
 
+    /// --------------------------------------------------
+    /// Переменные
+    /// --------------------------------------------------
+
     static float scale;     /// Масштаб символа
     static bool bTrace;     /// Флаг отображения следа
 
@@ -99,8 +107,7 @@ void Target::clearMemoryPoints()
     memoryPoints.clear();
 }
 
-/// Класс эталонов
-
+/// Класс параметров эталонов
 class Etalon : public Target
 {
 public:
@@ -130,6 +137,10 @@ private:
     /// Сохранение эталона в массив точек траектории
     void saveEtalon(float _x, float _y, float _h, double _time = 0.0);
 
+    /// --------------------------------------------------
+    /// Переменные
+    /// --------------------------------------------------
+
     static bool bEtalon;        /// Флаг отображения эталонов
 
     TPubEtalon *tPubEtalon;     /// Структура данных эталона
@@ -150,8 +161,7 @@ bool Etalon::isVisual()
     return bEtalon;
 }
 
-/// Класс трасс
-
+/// Класс параметров трасс
 class Track : public Target
 {
 public:
@@ -190,6 +200,10 @@ private:
     /// Сохранение трассы в массив точек траектории
     void saveTrack(float _x, float _y, float _h, unsigned char _sensCount = 0);
 
+    /// --------------------------------------------------
+    /// Переменные
+    /// --------------------------------------------------
+
     static bool bTrack;     /// Флаг отображения трасс
     static bool bGroup;     /// Флаг выбора только лидеров групп
 
@@ -219,6 +233,8 @@ void Track::setVisual(bool _bTrack)
 bool Track::isVisual()
 {
     return bTrack;
+}
+
 }
 
 #endif // TARGET_H

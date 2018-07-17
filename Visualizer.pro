@@ -39,27 +39,35 @@ TEMPLATE = app
 
 DESTDIR = $$PWD/../App
 
-SOURCES += Visualizer.cpp \
-    Painter.cpp \
-    Target.cpp \
+SOURCES += \
+    painter.cpp \
+    target.cpp \
     main.cpp \
-    Tool.cpp \
-    GraphHeight.cpp \
-    MainThread.cpp \
-    MainWindow.cpp \
-    AboutEtalon.cpp \
-    AboutTrack.cpp
+    graphheight.cpp \
+    mainthread.cpp \
+    mainwindow.cpp \
+    aboutetalon.cpp \
+    abouttrack.cpp \
+    playpause.cpp \
+    status.cpp \
+    tertiaryprocessingofdata.cpp \
+    imitation.cpp \
+    settings.cpp
 
-HEADERS += Visualizer.h\
-    Painter.h \
-    Target.h \
-    Tool.h \
-    GraphHeight.h \
-    MainThread.h \
-    MainWindow.h \
-    AboutEtalon.h \
+HEADERS +=\
+    painter.h \
+    target.h \
+    graphheight.h \
+    mainthread.h \
+    mainwindow.h \
+    aboutetalon.h \
     define.h \
-    AboutTrack.h
+    abouttrack.h \
+    playpause.h \
+    status.h \
+    tertiaryprocessingofdata.h \
+    imitation.h \
+    settings.h
 
 unix {
     target.path = /usr/lib

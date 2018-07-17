@@ -1,6 +1,11 @@
-#include "GraphHeight.h"
+#include "graphheight.h"
 
-GraphHeight::GraphHeight() : etalonIsSelected(false), trackIsSelected(false)
+namespace Visualizer
+{
+
+/// Класс виджета отображения графика высоты
+GraphHeight::GraphHeight(QWidget *_parent)
+    : Grapher2D(_parent), etalonIsSelected(false), trackIsSelected(false)
 {
     setCSZoom(GEN_ZOOM);
     setCSZoomStep(H_STEP_ZOOM);
@@ -9,12 +14,23 @@ GraphHeight::GraphHeight() : etalonIsSelected(false), trackIsSelected(false)
     setCSAngles(false, true, false, false);
     setCSAbsValues(false);
     setCSZoomCenter(true);
+
+    startTimer(H_INTERVAL);
 }
 
 GraphHeight::~GraphHeight()
 {
+    resetGraph();
 }
 
+/// Очистка графика высоты
+void GraphHeight::resetGraph()
+{
+    etalonIsSelected = false;
+    trackIsSelected = false;
+}
+
+/// Установка отслеживаемого эталона
 void GraphHeight::setEtalon(Etalon *_etalon)
 {
     if(_etalon->getTPubEtalon() == NULL)
@@ -32,16 +48,9 @@ void GraphHeight::setEtalon(Etalon *_etalon)
     else if (etalon->getMemoryHeight(0) * getCSOrdScale() >
              height() / 2 - getCSOrdShift() - H_SHIFT * getCSOrdExpansion() * getCSZoom())
         setCSOrdShift(height() / 2 - etalon->getMemoryHeight(0) * getCSOrdScale() - H_SHIFT * getCSOrdExpansion() * getCSZoom());
-
-    repaint();
 }
 
-void GraphHeight::delEtalon()
-{
-    etalonIsSelected = false;
-    repaint();
-}
-
+/// Установка отслеживаемой трассы
 void GraphHeight::setTrack(Track *_track)
 {
     if(_track->getTGenTrc() == NULL)
@@ -59,16 +68,15 @@ void GraphHeight::setTrack(Track *_track)
     else if (track->getMemoryHeight(0) * getCSOrdScale() >
              height() / 2 - getCSOrdShift() - H_SHIFT * getCSOrdExpansion() * getCSZoom())
         setCSOrdShift(height() / 2 - track->getMemoryHeight(0) * getCSOrdScale() - H_SHIFT * getCSOrdExpansion() * getCSZoom());
-
-    repaint();
 }
 
-void GraphHeight::delTrack()
+/// Обновление отрисовки
+void GraphHeight::timerEvent(QTimerEvent *)
 {
-    trackIsSelected = false;
     repaint();
 }
 
+/// Отрисовка графика высоты
 void GraphHeight::paintEvent(QPaintEvent *_pEvent)
 {
     Grapher2D::paintEvent(_pEvent);
@@ -148,4 +156,6 @@ void GraphHeight::paintEvent(QPaintEvent *_pEvent)
     }
 
     p.end();
+}
+
 }

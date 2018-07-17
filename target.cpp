@@ -1,4 +1,7 @@
-#include "Target.h"
+#include "target.h"
+
+namespace Visualizer
+{
 
 float Target::scale = (float) GEN_ZOOM / XY_MEASURE;
 bool Target::bTrace = false;
@@ -343,4 +346,6 @@ void Track::saveTrack(float _x, float _y, float _h, unsigned char _sensCount)
     /// Проверка предельного количества точек в памяти
     if(memoryPoints.count() > GEN_LIMIT_POINTS)
         memoryPoints.removeLast();
+}
+
 }

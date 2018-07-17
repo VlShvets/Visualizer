@@ -1,41 +1,72 @@
 #ifndef GRAPHHEIGHT_H
 #define GRAPHHEIGHT_H
 
-#include <QWidget>
-#include <QPainter>
-#include <QMouseEvent>
+#include "target.h"
 
-#include "Target.h"
+#include "grapher2d.h"
 
-#include "Grapher2D.h"
+namespace Visualizer
+{
 
+/// Класс виджета отображения графика высоты
 class GraphHeight : public Grapher2D
 {
 public:
-    GraphHeight();
+    explicit        GraphHeight(QWidget *_parent = 0);
     ~GraphHeight();
 
+    /// Очистка графика высоты
+    void            resetGraph();
+
     /// Установка отслеживаемого эталона
-    void setEtalon(Etalon *_etalon);
+    void            setEtalon(Etalon *_etalon);
 
     /// Удаление отслеживаемого эталона
-    void delEtalon();
+    inline void     delEtalon();
 
     /// Установка отслеживаемой трассы
-    void setTrack(Track *_track);
+    void            setTrack(Track *_track);
 
     /// Удаление отслеживаемой трассы
-    void delTrack();
+    inline void     delTrack();
 
 protected:
-    void paintEvent(QPaintEvent *_pEvent);
+    /// Обновление отрисовки
+    void            timerEvent(QTimerEvent *);
+
+    /// Отрисовка графика высоты
+    void            paintEvent(QPaintEvent *_pEvent);
 
 private:
-    bool etalonIsSelected;  /// Флаг наличия эталона
-    bool trackIsSelected;   /// Флаг наличия трассы
+    /// --------------------------------------------------
+    /// Переменные
+    /// --------------------------------------------------
 
-    Etalon *etalon;         /// Отслеживаемый эталон
-    Track *track;           /// Отслеживаемая трасса
+    bool    etalonIsSelected;   /// Флаг наличия эталона
+    bool    trackIsSelected;    /// Флаг наличия трассы
+
+    /// --------------------------------------------------
+    /// Указатели на объекты классов
+    /// --------------------------------------------------
+
+    Etalon  *etalon;            /// Отслеживаемый эталон
+    Track   *track;             /// Отслеживаемая трасса    
 };
+
+
+
+/// Удаление отслеживаемой трассы
+void GraphHeight::delEtalon()
+{
+    etalonIsSelected = false;
+}
+
+/// Удаление отслеживаемого эталона
+void GraphHeight::delTrack()
+{
+    trackIsSelected = false;
+}
+
+}
 
 #endif // GRAPHHEIGHT_H

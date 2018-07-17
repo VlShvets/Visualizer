@@ -1,48 +1,107 @@
 #ifndef MAINTHREAD_H
 #define MAINTHREAD_H
 
+#include "painter.h"
+#include "imitation.h"
+#include "tertiaryprocessingofdata.h"
+#include "status.h"
+
 #include <QThread>
-#include <QApplication>
 
-#include <iostream>         /// Для std::cout
-#include <ctime>            /// Для CLOCKS_PER_SEC
+namespace Visualizer
+{
 
-#include "MainWindow.h"
-
-#include "TImit.h"
-#include "Poi.h"
-#include "TAir.h"
-#include "TSea.h"
-
-using namespace BIUS_A100::PTPV::air;
-using namespace BIUS_A100::PTPV::sea;
-
-//#include "test.h"
-
+/// Класс главного потока вычислений
 class MainThread : public QThread
 {
-public:
-    MainThread(MainWindow *_mainWindow);
+    Q_OBJECT
 
+public:
+    explicit    MainThread(Painter *_painter, Status *_status, const QString _deltaTime);
+    ~MainThread();
+
+    /// Поток вычислений
     void run();
 
+    /// Установление флага приостановления потока вычислений
+    inline void     setPause(const bool _pause);
+
+    /// Возвращение флага приостановления потока вычислений
+    inline bool     isPaused();
+
+    /// Передача информации в строку состояния
+    inline void     sendToStatus(TypeOfInfo _typeOfInfo, double _info);
+
+public slots:
+    /// Завершение потока вычислений
+    inline void     complete();
+
+    /// Установление времени между итерациями потока вычислений
+    inline void     setDeltaTime(const QString _deltaTime);
+
 private:
-    static void fpResultAir();                                                  /// Приём результатов "периодики" Air по каждой трассе
-    static void fpResultSurface(PTPV_TGenTrcMsg* pGenTrcMsg, void *pobject);    /// Приём результатов "периодики" Surface по каждой трассе
+    /// --------------------------------------------------
+    /// Указатели на объекты классов
+    /// --------------------------------------------------
 
-    /// Выводы на печать в консоль различной информации
-    void testPubEtalon(const TPubEtalon *_tPubEtalon, int _count) const;  /// Вывод на печать значений основных характеристик первых эталонов
-    void testTrcMsg(const TUTrcMsg &_tTrcMsg) const;                      /// Вывод на печать результата Предварительной Обработки Информации
-    void testGenTrcMsg(const PTPV_TGenTrcMsg *_tGenTrcMsg) const;         /// Вывод на печать результата Третичной Обработки Информации
-    void testGenTrc(const PTPV_TGenTrc *_tGenTrc, int _count) const;      /// Вывод на печать значений основных характеристик первых целей
+    Imitation                   *imitation;                 /// Указатель на объект класса внутренней имитации
+    TertiaryProcessingOfData    *tertiaryProcessingOfData;  /// Указатель на объект класса внутренней третичной обработки информации
+    Painter                     *painter;                   /// Указатель на объект класса отрисовки эталонов и трасс
+    Status                      *status;                    /// Указатель на объект класса отображения текущего состояния потока вычислений
 
-    static air::TMsgFormSet msgFormSet;     /// Признаки формирования сообщений потребителям по рез-там обработки на "периодике"
-    static PTPV_TGenTrcMsg genTrcMsg;       /// Сообщение с результатом ТОИ на "периодике"
-    static TUTrcMsg orderSP;                /// Распоряжения ТОИ на ВОИ на "периодике" (не используется)
+    /// --------------------------------------------------
+    /// Переменные
+    /// --------------------------------------------------
 
-    MainWindow *mainWindow;     /// Главное окно
+    /// Параметры процесса потока
+    int                 deltaTime;      /// Время между итерациями потока вычислений (в мс)
+    bool                isCompleted;    /// Флаг завершения потока вычислений
+    bool                isPause;        /// Флаг приостановления потока вычислений
+
+    /// Словари параметров ЗКВ, эталонов и трасс
+//    QMap <int, Stationary>      *stationary;    /// Словарь стационарных объектов   <номер, структура параметров>
+    const QMap <int, Etalon>    *etalons;       /// Словарь эталонов                <номер, структура параметров>
+    QMap <int, Track>           *airTracks;     /// Словарь воздушных трасс         <номер, структура параметров>
+    QMap <int, Track>           *surfaceTrack;  /// Словарь поверхностных трасс     <номер, структура параметров>
+
+    /// --------------------------------------------------
+    /// Константы
+    /// --------------------------------------------------
+
+    static constexpr float  PAUSE_T     = 1000.0;   /// Интервал проверки флага приостановления потока вычислений       (в мс)
+    static constexpr float  WAITING_T   = 1000.0;   /// Интервал времени ожидания между итерациями потока вычислний     (в мс)
 };
 
+/// Установление флага приостановления потока вычислений
+void MainThread::setPause(const bool _pause)
+{
+    isPause = _pause;
+}
 
+/// Возвращение флага приостановления потока вычислений
+bool MainThread::isPaused()
+{
+    return isPause;
+}
+
+/// Передача информации в строку состояния
+void MainThread::sendToStatus(TypeOfInfo _typeOfInfo, double _info)
+{
+    status->showInfo(_typeOfInfo, _info);
+}
+
+/// Завершение потока вычислений
+void MainThread::complete()
+{
+    isCompleted = true;
+}
+
+/// Установление времени между итерациями потока вычислений
+void MainThread::setDeltaTime(const QString _deltaTime)
+{
+    deltaTime = _deltaTime.toInt();
+}
+
+}
 
 #endif // MAINTHREAD_H
