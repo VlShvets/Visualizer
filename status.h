@@ -12,8 +12,8 @@ namespace Visualizer
 enum TypeOfInfo     /// Тип передаваемой информации
 {
     Time,           /// Текущее время
-    TrackAir,       /// Количество воздушных трасс
-    TrackSurface    /// Количество поверхностных трасс
+    AirTrack,       /// Количество воздушных трасс
+    SurfaceTrack    /// Количество поверхностных трасс
 };
 
 /// Класс виджета отображения текущего состояния потока вычислений
@@ -26,7 +26,10 @@ public:
     ~Status();
 
     /// Отображение полученной информации в строке состояния
-    void        showInfo(TypeOfInfo _typeOfInfo, double _info);
+    void        showInfo(TypeOfInfo _typeOfInfo, const float _info);
+
+    /// Очищение виджета отображения текущего состояния потока вычислений
+    void        clearing();
 
 private:
     /// --------------------------------------------------

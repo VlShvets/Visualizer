@@ -14,14 +14,18 @@ namespace Visualizer
 class AboutEtalon : public QScrollArea
 {
 public:
-    explicit    AboutEtalon(QWidget *_parent = 0);
+    explicit    AboutEtalon(QWidget *_parent = nullptr);
     ~AboutEtalon();
 
     /// Установка информации об эталоне
-    void        setInfoAboutEtalon(Etalon *_etalon, int _number);
+    void        setInfoAboutEtalon(TPubEtalon *_tPubEtalon, int _number);
 
     /// Очистка всех полей информации об эталоне
     void        resetInfoAboutEtalon();
+
+protected:
+    /// Обновление виджета отображения параметров эталона
+    void        timerEvent(QTimerEvent *);
 
 private:
     /// Обновление информации об эталоне

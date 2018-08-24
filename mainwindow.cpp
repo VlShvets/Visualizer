@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *_parent)
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf-8"));
 #endif
 
-    setWindowTitle(tr("Визуализатор 2.0"));
+    setWindowTitle(tr("Визуализатор 2.0.0"));
 
     aboutEtalon     = new AboutEtalon;
     aboutTrack      = new AboutTrack;
@@ -39,6 +39,12 @@ MainWindow::MainWindow(QWidget *_parent)
     tSettings->setMovable(false);
     addToolBar(tSettings);
 
+    /// Виджет отображения графика высоты
+    QDockWidget *dGraphHeight = new QDockWidget(tr("График высоты"), this);
+    dGraphHeight->setWidget(graphHeight);
+    dGraphHeight->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::LeftDockWidgetArea, dGraphHeight);
+
     /// Виджет отображения параметров эталонов
     QDockWidget *dAboutEtalon = new QDockWidget(tr("Информация об эталоне"), this);
     dAboutEtalon->setWidget(aboutEtalon);
@@ -50,14 +56,6 @@ MainWindow::MainWindow(QWidget *_parent)
     dAboutTrack->setWidget(aboutTrack);
     dAboutTrack->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, dAboutTrack);
-
-    tabifyDockWidget(dAboutEtalon, dAboutTrack);
-
-    /// Виджет отображения графика высоты
-    QDockWidget *dGraphHeight = new QDockWidget(tr("График высоты"), this);
-    dGraphHeight->setWidget(graphHeight);
-    dGraphHeight->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    addDockWidget(Qt::RightDockWidgetArea, dGraphHeight);
 
     /// Виджет отображения текущего состояния потока вычислений
     statusBar()->addWidget(status);

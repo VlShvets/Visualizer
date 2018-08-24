@@ -12,59 +12,55 @@ namespace Visualizer
 class GraphHeight : public Grapher2D
 {
 public:
-    explicit        GraphHeight(QWidget *_parent = 0);
+    explicit    GraphHeight(QWidget *_parent = nullptr);
     ~GraphHeight();
 
+    /// Установка указателя на словарь эталонов
+    inline void setEtalons(QMap <int, Etalon> &_etalons);
+
+    /// Установка указателя на словарь воздушных трасс
+    inline void setAirTracks(QMap <int, Track> &_airTracks);
+
     /// Очистка графика высоты
-    void            resetGraph();
+    void        resetGraph();
 
     /// Установка отслеживаемого эталона
-    void            setEtalon(Etalon *_etalon);
-
-    /// Удаление отслеживаемого эталона
-    inline void     delEtalon();
+    void        setEtalon(int _indexOfEtalons);
 
     /// Установка отслеживаемой трассы
-    void            setTrack(Track *_track);
-
-    /// Удаление отслеживаемой трассы
-    inline void     delTrack();
+    void        setAirTrack(int _indexOfAirTracks);
 
 protected:
     /// Обновление отрисовки
-    void            timerEvent(QTimerEvent *);
+    void        timerEvent(QTimerEvent *);
 
     /// Отрисовка графика высоты
-    void            paintEvent(QPaintEvent *_pEvent);
+    void        paintEvent(QPaintEvent *_pEvent);
 
 private:
     /// --------------------------------------------------
     /// Переменные
     /// --------------------------------------------------
 
-    bool    etalonIsSelected;   /// Флаг наличия эталона
-    bool    trackIsSelected;    /// Флаг наличия трассы
+    /// Номера выбранных эталонов и трасс
+    int     indexOfEtalons;     /// Номер выбранного эталона
+    int     indexOfAirTracks;   /// Номер выбранной трассы
 
-    /// --------------------------------------------------
-    /// Указатели на объекты классов
-    /// --------------------------------------------------
-
-    Etalon  *etalon;            /// Отслеживаемый эталон
-    Track   *track;             /// Отслеживаемая трасса    
+    /// Указатели на словари параметров ЗКВ, эталонов и трасс
+    QMap <int, Etalon>  *etalons;       /// Словарь эталонов                <номер, структура параметров>
+    QMap <int, Track>   *airTracks;     /// Словарь воздушных трасс         <номер, структура параметров>
 };
 
-
-
-/// Удаление отслеживаемой трассы
-void GraphHeight::delEtalon()
+/// Установка указателя на словарь эталонов
+void GraphHeight::setEtalons(QMap <int, Etalon> &_etalons)
 {
-    etalonIsSelected = false;
+    etalons = &_etalons;
 }
 
-/// Удаление отслеживаемого эталона
-void GraphHeight::delTrack()
+/// Установка указателя на словарь воздушных трасс
+void GraphHeight::setAirTracks(QMap<int, Track> &_airTracks)
 {
-    trackIsSelected = false;
+    airTracks = &_airTracks;
 }
 
 }

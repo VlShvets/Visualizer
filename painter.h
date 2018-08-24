@@ -8,9 +8,9 @@
 namespace Visualizer
 {
 
+class GraphHeight;
 class AboutEtalon;
 class AboutTrack;
-class GraphHeight;
 
 /// Класс виджета отрисовки эталонов и трасс
 class Painter : public Grapher2D
@@ -18,18 +18,21 @@ class Painter : public Grapher2D
     Q_OBJECT
 
 public:
-    explicit        Painter(AboutEtalon *_aboutEtalon, AboutTrack *_aboutTrack, GraphHeight *_graphHeight,
-                            QWidget *_parent = 0);
+    explicit    Painter(AboutEtalon *_aboutEtalon, AboutTrack *_aboutTrack, GraphHeight *_graphHeight,
+                            QWidget *_parent = nullptr);
     ~Painter();
 
-    /// Установка стационарных объектов
-//    void            setStationary();
+    /// Установка указателя на словарь стационарных объектов
+//    void        setStationary(QMap <int, Stationary> &_stationary);
 
-    /// Установка эталонов
-    void            setEtalons(TPubEtalon *_tPubEtalon, double _time);
+    /// Установка указателя на словарь эталонов
+    void        setEtalons(QMap <int, Etalon> &_etalons);
 
-    /// Установка трасс
-    void            setTracks(PTPV_TGenTrc *_tGenTrc);
+    /// Установка указателя на словарь воздушных трасс
+    void        setAirTracks(QMap <int, Track> &_airTracks);
+
+    /// Установка указателя на словарь поверхностных трасс
+    void        setSurfaceTracks(QMap <int, Track> &_surfaceTracks);
 
     /// Очищение отрисовки
     void            clearing();
@@ -50,21 +53,24 @@ public slots:
     /// Установка флага отображения лидеров групп
     inline void     setVisibleOfGroupLeaders(bool _isVisibleOfGroupLeaders);
 
-    /// Установка флага отображения следов трасс
-    inline void     setVisibleOfTrackTraces(bool _isVisibleOfTrackTraces);
+    /// Установка флага отображения траекторий
+    inline void     setVisibleOfTrajectories(bool _isVisibleOfTrajectories);
 
 protected:
     /// События нажатия кнопки мыши
-    void            mousePressEvent(QMouseEvent * _mEvent);
+    void            mousePressEvent(QMouseEvent *_mEvent);
 
     /// События перемещения мыши
-    void            mouseMoveEvent(QMouseEvent * _mEvent);
+    void            mouseMoveEvent(QMouseEvent *_mEvent);
 
     /// События отпускания кнопки мыши
-    void            mouseReleaseEvent(QMouseEvent * _mEvent);
+    void            mouseReleaseEvent(QMouseEvent *_mEvent);
+
+    /// События двойного нажатия кнопки мыши
+    void            mouseDoubleClickEvent(QMouseEvent *_mEvent);
 
     /// События колеса мыши
-    void            wheelEvent(QWheelEvent * _wEvent);
+    void            wheelEvent(QWheelEvent *_wEvent);
 
     /// Обновление отрисокви
     void            timerEvent(QTimerEvent *);
@@ -91,19 +97,11 @@ private:
     /// Переменные
     /// --------------------------------------------------
 
-    int numberHighlightedEtalon;    /// Номер выделенного эталона
-    int numberSelectedEtalon;       /// Номер выбранного эталона
-
-    int numberHighlightedTrack;     /// Номер выделенной цели
-    int numberSelectedTrack;        /// Номер выбранной цели
-
-    bool bFixed;                    /// Флаг фиксации изображения на экране
-
     /// Указатели на словари параметров ЗКВ, эталонов и трасс
-//    const QMap <int, Stationary>    *stationary;    /// Словарь стационарных объектов   <номер, структура параметров>
-    const QMap <int, Etalon>        *etalons;       /// Словарь эталонов                <номер, структура параметров>
-    const QMap <int, Track>         *airTracks;     /// Словарь воздушных трасс         <номер, структура параметров>
-    const QMap <int, Track>         *surfaceTrack;  /// Словарь поверхностных трасс     <номер, структура параметров>
+//    QMap <int, Stationary>    *stationary;    /// Словарь стационарных объектов   <номер, структура параметров>
+    QMap <int, Etalon>        *etalons;       /// Словарь эталонов                <номер, структура параметров>
+    QMap <int, Track>         *airTracks;     /// Словарь воздушных трасс         <номер, структура параметров>
+    QMap <int, Track>         *surfaceTracks; /// Словарь поверхностных трасс     <номер, структура параметров>
 
     /// Флаги отображения
     bool    isVisibleOfAreas;           /// Флаг отображения зон видимостиы
@@ -111,7 +109,13 @@ private:
     bool    isVisibleOfAirTracks;       /// Флаг отображения воздушных трасс
     bool    isVisibleOfSurfaceTracks;   /// Флаг отображения поверхностных трасс
     bool    isVisibleOfGroupLeaders;    /// Флаг отображения лидеров групп
-    bool    isVisibleOfTrackTraces;     /// Флаг отображения следов трасс
+    bool    isVisibleOfTrajectories;    /// Флаг отображения траекторий
+
+    /// Номера выделенных и выбранных объектов
+    int     numberHighlightedEtalon;    /// Номер выделенного эталона
+    int     numberSelectedEtalon;       /// Номер выбранного эталона
+    int     numberHighlightedTrack;     /// Номер выделенной трассы
+    int     numberSelectedTrack;        /// Номер выбранной трассы
 };
 
 /// Установка флага отображения зон видимости
@@ -144,10 +148,10 @@ void Painter::setVisibleOfGroupLeaders(bool _isVisibleOfGroupLeaders)
     isVisibleOfGroupLeaders = _isVisibleOfGroupLeaders;
 }
 
-/// Установка флага отображения следов трасс
-void Painter::setVisibleOfTrackTraces(bool _isVisibleOfTrackTraces)
+/// Установка флага отображения траекторий
+void Painter::setVisibleOfTrajectories(bool _isVisibleOfTrajectories)
 {
-    isVisibleOfTrackTraces = _isVisibleOfTrackTraces;
+    isVisibleOfTrajectories = _isVisibleOfTrajectories;
 }
 
 }

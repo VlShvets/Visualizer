@@ -5,7 +5,7 @@ namespace Visualizer
 
 /// Класс виджета управления потоком вычислений
 PlayPause::PlayPause(Painter *_painter, Status *_status, QWidget *_parent)
-    :QWidget(_parent), painter(_painter), status(_status), mainThread(NULL)
+    :QWidget(_parent), painter(_painter), status(_status), mainThread(nullptr)
 {
     QHBoxLayout *hLayout = new QHBoxLayout(this);
 
@@ -20,7 +20,7 @@ PlayPause::PlayPause(Painter *_painter, Status *_status, QWidget *_parent)
 
     /// Кнопка "Play/Pause"
     pPlayPause = new QPushButton(this);
-    pPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    pPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
     pPlayPause->setFixedWidth(50);
     connect(pPlayPause, SIGNAL(clicked()), this, SLOT(stateChanged()));
     hLayout->addWidget(pPlayPause);
@@ -37,24 +37,27 @@ PlayPause::PlayPause(Painter *_painter, Status *_status, QWidget *_parent)
     hLayout->addWidget(new QLabel(tr("Время между итерациями потока вычислений (в мс)"), this));
 
     /// Виджет регулирования времени между итерациями потока вычислений
-    cDeltaTime = new QComboBox;
-    cDeltaTime->addItems(QStringList()  << "1000"
-                                        << "1500"
-                                        << "2000"
-                                        << "3000"
-                                        << "5000"
-                                        << "10000");
-    hLayout->addWidget(cDeltaTime);
+    cSleepTime = new QComboBox;
+    cSleepTime->addItems(QStringList()  << "1000"
+                                        << "500"
+                                        << "250"
+                                        << "100"
+                                        << "50"
+                                        << "25"
+                                        << "10");
+    hLayout->addWidget(cSleepTime);
 
     hLayout->addWidget(new QSplitter(this));
 
     this->setLayout(hLayout);
+
+    createOfThread();
 }
 
 PlayPause::~PlayPause()
 {
     delete pPlayPause;
-    delete cDeltaTime;
+    delete cSleepTime;
 
     /// Завершение имеющегося потока вычислений
     completeOfThread();
@@ -65,7 +68,7 @@ void PlayPause::reStart()
 {
     /// Возвращение флага приостановления потока вычислений
     bool isPaused;
-    if(mainThread)
+    if(mainThread != nullptr)
         isPaused = mainThread->isPaused();
     else
         isPaused = true;
@@ -85,7 +88,7 @@ void PlayPause::stateChanged()
 {
     /// Возвращение флага приостановления потока вычислений
     bool isPaused;
-    if(mainThread)
+    if(mainThread != nullptr)
         isPaused = mainThread->isPaused();
     else
         isPaused = true;
@@ -114,24 +117,24 @@ void PlayPause::stop()
 /// Создание нового потока вычислений
 void PlayPause::createOfThread()
 {
-    if(!mainThread)
-    {
-        mainThread = new MainThread(painter, status, cDeltaTime->currentText());
-        QObject::connect(cDeltaTime, SIGNAL(activated(QString)), mainThread, SLOT(setDeltaTime(QString)));
-        mainThread->start();
-    }
+    if(mainThread != nullptr)
+        return;
+
+    mainThread = new MainThread(painter, status, cSleepTime->currentText());
+    QObject::connect(cSleepTime, SIGNAL(activated(QString)), mainThread, SLOT(setSleepTime(QString)));
+    mainThread->start();
 }
 
 /// Завершение имеющегося потока вычислений
 void PlayPause::completeOfThread()
 {
-    if(mainThread)
-    {
-        mainThread->complete();
-        mainThread->wait();
-        delete mainThread;
-        mainThread = NULL;
-    }
+    if(mainThread == nullptr)
+        return;
+
+    mainThread->complete();
+    mainThread->wait();
+    delete mainThread;
+    mainThread = nullptr;
 }
 
 }

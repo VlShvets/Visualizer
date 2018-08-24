@@ -7,7 +7,8 @@ namespace Visualizer
 AboutTrack::AboutTrack(QWidget *_parent)
     : QScrollArea(_parent)
 {
-    labelNumber     = new QLabel(this);
+    labelNumber     = new QLabel("\t\t\t");
+
     labelAT         = new LabelAT;
 
     QWidget *pWidget = new QWidget(this);
@@ -91,32 +92,35 @@ AboutTrack::AboutTrack(QWidget *_parent)
     setWidget(pWidget);
 
     resetInfoAboutTrack();
+
+    startTimer(ABOUT_INTERVAL);
 }
 
 AboutTrack::~AboutTrack()
 {
+    tGenTrc = nullptr;
+
     delete labelAT;
     delete labelNumber;
 }
 
 /// Установка информации о трассе
-void AboutTrack::setInfoAboutTrack(Track *_track, int _number)
+void AboutTrack::setInfoAboutTrack(PTPV_TGenTrc *_tGenTrc, int _number)
 {
-    if(_track->getTGenTrc() == NULL)
-    {
-        resetInfoAboutTrack();
+    if(_tGenTrc == nullptr)
         return;
-    }
+
+    tGenTrc = _tGenTrc;
+    updateInfoAboutTrack();
 
     labelNumber->setText(QString::number(_number));
-    tGenTrc = _track->getTGenTrc();
-
-    updateInfoAboutTrack();
 }
 
 /// Очистка всех полей информации о трассе
 void AboutTrack::resetInfoAboutTrack()
 {
+    tGenTrc = nullptr;
+
     labelNumber->setText(QString::number(0.0));
 
     labelAT->lTStart.setText(QString::number(0.0));
@@ -180,12 +184,24 @@ void AboutTrack::resetInfoAboutTrack()
 //    labelAT->lIdentBlock.setText(tr("Нет"));
 //    labelAT->lObjSizeP.setText(QString::number(0.0));
 //    labelAT->lObjSizeS.setText(QString::number(0.0));
-//    labelAT->lFlyInf.setText(QString::number(0.0));
+    //    labelAT->lFlyInf.setText(QString::number(0.0));
+}
+
+/// Обновление виджета отображения параметров трасс
+void AboutTrack::timerEvent(QTimerEvent *)
+{
+    if(tGenTrc == nullptr)
+        return;
+
+    updateInfoAboutTrack();
 }
 
 /// Обновление информации о трассе
 void AboutTrack::updateInfoAboutTrack()
 {
+    if(tGenTrc == nullptr)
+        return;
+
     labelAT->lTStart.setText(QString::number(tGenTrc->tStart));
     labelAT->lTXYUpdate.setText(QString::number(tGenTrc->tXYUpdate));
     labelAT->lTHUpdate.setText(QString::number(tGenTrc->tHUpdate));
@@ -242,8 +258,8 @@ void AboutTrack::updateInfoAboutTrack()
 
     labelAT->lOGP.setText(QString::number(tGenTrc->OGP));
 
-    labelAT->lIVO.setText(QString::number(tGenTrc->IVO));
-    labelAT->lTVO.setText(QString::number(tGenTrc->TVO));
+    labelAT->lIVO.setText(QString::number(tGenTrc->IO));
+    labelAT->lTVO.setText(QString::number(tGenTrc->TO));
     labelAT->lQuant.setText(QString::number(tGenTrc->quant));
 
 //    labelAT->lAttackStateFA.setText(QString::number(tGenTrc->attackStateFA));

@@ -9,7 +9,7 @@ namespace Visualizer
 /// Общие параметры
 
 #define GEN_ZOOM                10      /// Количество пикселей в одном делении по умолчанию
-#define GEN_SUM_VISUAL_VALUES   10      /// Отображаемое количество значений массива в окне Информации
+#define GEN_SUM_VISUAL_VALUES   10      /// Отображаемое количество значений массива в окне параметров
 #define GEN_LIMIT_POINTS        1000    /// Предельное колличество отображаемых точек траектории
 
 /// Параметры цветов зон видимости
@@ -40,9 +40,9 @@ namespace Visualizer
 
 /// Толщина эталонов и трасс
 
-#define WDT_PATH                1       /// Толщина траекторий
-#define WDT_MEMORY_POINT        2       /// Размер предыдущих точек
-#define WDT_LAST_POINT          3       /// Размер последней точки
+#define WDT_TRAJECTORY          1       /// Толщина траекторий
+#define WDT_TRAJECTORY_POINT    2       /// Размер предыдущих точек траектории
+#define WDT_CURRENT_POINT       3       /// Размер текущей точки траектории
 #define WDT_ARROW               5       /// Толщина символа
 #define WDT_HIGHLIGHT           15      /// Толщина подсвечивания при наведении
 #define WDT_SELECT              15      /// Толщина подсвечивания при выборе
@@ -77,6 +77,10 @@ namespace Visualizer
 #define H_EXPANSION             2       /// Коэффициент растяжения оси ординат
 #define H_SHIFT                 5       /// Сдвиг относительно правой и верхней грани
 #define H_INTERVAL              1000    /// Интервал обновления графика (в мс)
+
+/// Окна параметров
+
+#define ABOUT_INTERVAL          1000    /// Интервал обновления окон параметров (в мс)
 
 /// Параметры пунктов управления
 

@@ -42,10 +42,10 @@ Settings::Settings(Painter *_painter, QWidget *_parent)
     hBoxLayout->addWidget(cGroupLeaders);
 
     /// Опция отображения следов трасс
-    QCheckBox *cTrackTraces = new QCheckBox(tr("Cледы трасс"), this);
-    cTrackTraces->setChecked(false);
-    connect(cTrackTraces, SIGNAL(clicked(bool)), painter, SLOT(setVisibleOfTrackTraces(bool)));
-    hBoxLayout->addWidget(cTrackTraces);
+    QCheckBox *cTrajectories = new QCheckBox(tr("Траектории"), this);
+    cTrajectories->setChecked(false);
+    connect(cTrajectories, SIGNAL(clicked(bool)), painter, SLOT(setVisibleOfTrajectories(bool)));
+    hBoxLayout->addWidget(cTrajectories);
 
     hBoxLayout->addWidget(new QSplitter(this));
 

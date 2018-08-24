@@ -52,7 +52,8 @@ SOURCES += \
     status.cpp \
     tertiaryprocessingofdata.cpp \
     imitation.cpp \
-    settings.cpp
+    settings.cpp \
+    preliminaryprocessingofdata.cpp
 
 HEADERS +=\
     painter.h \
@@ -67,7 +68,8 @@ HEADERS +=\
     status.h \
     tertiaryprocessingofdata.h \
     imitation.h \
-    settings.h
+    settings.h \
+    preliminaryprocessingofdata.h
 
 unix {
     target.path = /usr/lib

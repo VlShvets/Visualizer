@@ -19,7 +19,7 @@ namespace Visualizer
 class MainWindow : public QMainWindow
 {
 public:
-    explicit    MainWindow(QWidget *_parent = 0);
+    explicit    MainWindow(QWidget *_parent = nullptr);
     ~MainWindow();
 
 private:

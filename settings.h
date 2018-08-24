@@ -16,7 +16,7 @@ class Settings : public QWidget
     Q_OBJECT
 
 public:
-    explicit    Settings(Painter *_painter, QWidget *_parent = 0);
+    explicit    Settings(Painter *_painter, QWidget *_parent = nullptr);
     ~Settings();
 
 private:

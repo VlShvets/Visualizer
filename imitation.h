@@ -6,7 +6,6 @@
 #include <QMap>
 
 #include "TImit.h"
-#include "Poi.h"
 
 namespace Visualizer
 {
@@ -19,20 +18,31 @@ public:
     ~Imitation();
 
     /// Возвращение словаря стационарных объектов
-//    inline QMap <int, Stationary>       *getStationary();
+//    inline QMap <int, Stationary>   *getStationary();
 
     /// Возвращение словаря эталонов
-    inline const QMap <int, Etalon>     *getEtalons();
+    inline QMap <int, Etalon>       *getEtalons();
+
+    /// Возвращение указателя на статический массив эталонов
+    TPubEtalon                      *getTPubEtalon();
+
+    /// Возвращение указателя на статический массив сообщений об эталонах
+    TMsgTrc                         *getTMsgTrc();
 
     /// Вычислительный процесс
-    void                                run(const float _currentTime);
+    int                             run(const float _currentTime);
 
-private:
+private:    
+    /// Обновление словаря эталонов
+    void                            updateEtalons(const float _currentTime);
+
     /// --------------------------------------------------
     /// Указатели на объекты классов
     /// --------------------------------------------------
 
     TImit                   *tImit;         /// Указатель на объект класса имитации
+    TPubEtalon              *tPubEtalon;    /// Указатель на статический массив эталонов
+    TMsgTrc                 *tMsgTrc;       /// Указатель на статический массив сообщений об эталонах
 
     /// --------------------------------------------------
     /// Переменные
@@ -50,7 +60,7 @@ private:
 //}
 
 /// Возвращение словаря эталонов
-const QMap <int, Etalon> *Imitation::getEtalons()
+QMap <int, Etalon> *Imitation::getEtalons()
 {
     return &etalons;
 }

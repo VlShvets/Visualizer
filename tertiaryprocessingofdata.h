@@ -8,21 +8,22 @@
 #include "TAir.h"
 #include "TSea.h"
 
-using namespace BIUS_A100::PTPV::air;
-using namespace BIUS_A100::PTPV::sea;
-
 namespace Visualizer
 {
 
-/// Класс внутренней третичной обработки информации
+using namespace BIUS_A100;
+using namespace PTPV::air;
+using namespace PTPV::sea;
+
+/// Класс внутренней третичной обработки данных
 class TertiaryProcessingOfData
 {
 public:
     explicit    TertiaryProcessingOfData();
     ~TertiaryProcessingOfData();
 
-    /// Установление эталонов
-    inline void                 setEtalons(const QMap <int, Etalon> &_etalons);
+    /// Установка указателя на статический массив сообщений об эталонах
+    void                        setTUTrcMsg(TUTrcMsg *_tUTrcMsg);
 
     /// Возврат указателя на словарь воздушных трасс
     inline QMap <int, Track>    *getAirTracks();
@@ -31,53 +32,67 @@ public:
     inline QMap <int, Track>    *getSurfaceTracks();
 
     /// Вычислительный процесс
-    void                        run();
+    void                        run(const int _count, const float _currentTime);
 
 private:
-    /// Приём результатов "периодики" Air по каждой трассе
-    static void fpResultAir();
+    /// Обновление словаря воздушных трасс
+    void                            updateAirTracks();
 
-    /// Приём результатов "периодики" Surface по каждой трассе
-    static void fpResultSurface(PTPV_TGenTrcMsg* pGenTrcMsg, void *pobject);
+    /// Обновление словаря поверхностных трасс
+    void                            updateSurfaceTracks();
+
+    /// Приём результатов периодической проверки по каждой воздушной трассе
+    static void                     fpResultAir();
+
+    /// Приём результатов периодической проверки по каждой поверхностной трассе
+    static void                     fpResultSurface(PTPV_TGenTrcMsg *_pGenTrcMsg, void *_pobject);
 
     /// --------------------------------------------------
+    /// Указатели
+    /// --------------------------------------------------
+
     /// Указатели на объекты классов
-    /// --------------------------------------------------
     TAir        *tAir;      /// Указатель на объект класса третичной обработки данных по воздушным объектам
     TSea        *tSurface;  /// Указатель на объект класса третичной обработки данных по поверхностным объектам
+
+    /// Указатели на статические массивы
+    TUTrcMsg    *tUTrcMsg;  /// Указатель на статический массив сообщений об эталонах
 
     /// --------------------------------------------------
     /// Переменные
     /// --------------------------------------------------
 
-    /// Словари параметров стационарных объектов и эталонов
-    const QMap <int, Etalon>        *etalons;       /// Словарь эталонов                <номер, структура параметров>
+    /// Время последнего вызова периодической проверки
+    float   periodicLastTime;   /// Время последнего вызова периодической проверки
+
+    /// Статические массивы структур трасс
+    PTPV_TGenTrc    tGenTrcAir[UGEN_TRC_MAX + 1];               /// Статический массив структур воздушных трасс
+    PTPV_TGenTrc    tGenTrcSurface[UGEN_SURFACE_TRC_MAX + 1];   /// Статический массив структур поверхностных трасс
 
     /// Словарь параметров трасс
-    QMap <int, Track>               airTracks;      /// Словарь воздушных трасс         <номер, структура параметров>
-    QMap <int, Track>               surfaceTrack;   /// Словарь поверхностных трасс     <номер, структура параметров>
+    QMap <int, Track>   airTracks;      /// Словарь воздушных трасс         <номер, структура параметров>
+    QMap <int, Track>   surfaceTracks;  /// Словарь поверхностных трасс     <номер, структура параметров>
 
-    static air::TMsgFormSet msgFormSet;     /// Признаки формирования сообщений потребителям по рез-там обработки на "периодике"
-    static PTPV_TGenTrcMsg genTrcMsg;       /// Сообщение с результатом ТОИ на "периодике"
-    static TUTrcMsg orderSP;                /// Распоряжения ТОИ на ВОИ на "периодике" (не используется)
+    /// Статические переменные
+    static air::TMsgFormSet     tMsgFormSetAir;         /// Признаки формирования сообщений потребителям по воздушным объектам
+    static sea::TMsgFormSet     tMsgFormSetSurface;     /// Признаки формирования сообщений потребителям по поверхностным объектам
+    static PTPV_TGenTrcMsg      tGenTrcMsg[2];          /// Сообщение с результатом третичной обработки данных
+    static TUTrcMsg             tOrderSP[2];            /// Распоряжения третичной обработки данных (не используются)
+
+    /// Статический указатель
+    static TertiaryProcessingOfData     *tempObject;    /// Статический указатель для работы с не статическими объектами класса
 };
 
-/// Установление эталонов
-void TertiaryProcessingOfData::setEtalons(const QMap<int, Etalon> &_etalons)
-{
-    etalons = &_etalons;
-}
-
 /// Возврат указателя на словарь воздушных трасс
-QMap<int, Track> *TertiaryProcessingOfData::getAirTracks()
+QMap <int, Track> *TertiaryProcessingOfData::getAirTracks()
 {
     return &airTracks;
 }
 
 /// Возврат указателя на словарь поверхностных трасс
-QMap<int, Track> *TertiaryProcessingOfData::getSurfaceTracks()
+QMap <int, Track> *TertiaryProcessingOfData::getSurfaceTracks()
 {
-    return &surfaceTrack;
+    return &surfaceTracks;
 }
 
 }

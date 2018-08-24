@@ -2,9 +2,11 @@
 #define MAINTHREAD_H
 
 #include "painter.h"
-#include "imitation.h"
-#include "tertiaryprocessingofdata.h"
 #include "status.h"
+
+#include "imitation.h"
+#include "preliminaryprocessingofdata.h"
+#include "tertiaryprocessingofdata.h"
 
 #include <QThread>
 
@@ -37,39 +39,41 @@ public slots:
     inline void     complete();
 
     /// Установление времени между итерациями потока вычислений
-    inline void     setDeltaTime(const QString _deltaTime);
+    inline void     setSleepTime(const QString _sleepTime);
 
 private:
     /// --------------------------------------------------
     /// Указатели на объекты классов
     /// --------------------------------------------------
 
-    Imitation                   *imitation;                 /// Указатель на объект класса внутренней имитации
-    TertiaryProcessingOfData    *tertiaryProcessingOfData;  /// Указатель на объект класса внутренней третичной обработки информации
-    Painter                     *painter;                   /// Указатель на объект класса отрисовки эталонов и трасс
-    Status                      *status;                    /// Указатель на объект класса отображения текущего состояния потока вычислений
+    Painter                     *painter;                       /// Указатель на объект класса отрисовки эталонов и трасс
+    Status                      *status;                        /// Указатель на объект класса отображения текущего состояния потока вычислений
+
+    Imitation                   *imitation;                     /// Указатель на объект класса внутренней имитации
+    PreliminaryProcessingOfData *preliminaryProcessingOfData;   /// Указатель на объект класса внутренней предварительной обработки информации
+    TertiaryProcessingOfData    *tertiaryProcessingOfData;      /// Указатель на объект класса внутренней третичной обработки информации
 
     /// --------------------------------------------------
     /// Переменные
     /// --------------------------------------------------
 
     /// Параметры процесса потока
-    int                 deltaTime;      /// Время между итерациями потока вычислений (в мс)
+    int                 sleepTime;      /// Время между итерациями потока вычислений (в мс)
     bool                isCompleted;    /// Флаг завершения потока вычислений
     bool                isPause;        /// Флаг приостановления потока вычислений
 
-    /// Словари параметров ЗКВ, эталонов и трасс
-//    QMap <int, Stationary>      *stationary;    /// Словарь стационарных объектов   <номер, структура параметров>
-    const QMap <int, Etalon>    *etalons;       /// Словарь эталонов                <номер, структура параметров>
-    QMap <int, Track>           *airTracks;     /// Словарь воздушных трасс         <номер, структура параметров>
-    QMap <int, Track>           *surfaceTrack;  /// Словарь поверхностных трасс     <номер, структура параметров>
+    /// Указатели на словари параметров ЗКВ, эталонов и трасс
+//    QMap <int, Stationary>  *stationary;    /// Словарь стационарных объектов               <номер, структура параметров>
+    QMap <int, Etalon>      *etalons;       /// Указатель на словарь эталонов               <номер, структура параметров>
+    QMap <int, Track>       *airTracks;     /// Указатель на словарь воздушных трасс        <номер, структура параметров>
+    QMap <int, Track>       *surfaceTracks; /// Указатель на словарь поверхностных трасс    <номер, структура параметров>
 
     /// --------------------------------------------------
     /// Константы
     /// --------------------------------------------------
 
-    static constexpr float  PAUSE_T     = 1000.0;   /// Интервал проверки флага приостановления потока вычислений       (в мс)
-    static constexpr float  WAITING_T   = 1000.0;   /// Интервал времени ожидания между итерациями потока вычислний     (в мс)
+    static constexpr float  PAUSE_T = 1000.0;   /// Интервал проверки флага приостановления потока вычислений       (в мс)
+    static constexpr float  DELTA_T = 1.0;      /// Интервал времени ожидания между итерациями потока вычислний     (в мс)
 };
 
 /// Установление флага приостановления потока вычислений
@@ -97,9 +101,9 @@ void MainThread::complete()
 }
 
 /// Установление времени между итерациями потока вычислений
-void MainThread::setDeltaTime(const QString _deltaTime)
+void MainThread::setSleepTime(const QString _sleepTime)
 {
-    deltaTime = _deltaTime.toInt();
+    sleepTime = _sleepTime.toInt();
 }
 
 }

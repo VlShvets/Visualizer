@@ -14,14 +14,18 @@ namespace Visualizer
 class AboutTrack : public QScrollArea
 {
 public:
-    explicit    AboutTrack(QWidget *_parent = 0);
+    explicit    AboutTrack(QWidget *_parent = nullptr);
     ~AboutTrack();
 
     /// Установка информации о трассе
-    void        setInfoAboutTrack(Track *_track, int _number);
+    void        setInfoAboutTrack(PTPV_TGenTrc *_tGenTrc, int _number);
 
     /// Очистка всех полей информации о трассе
     void        resetInfoAboutTrack();
+
+protected:
+    /// Обновление виджета отображения параметров трасс
+    void        timerEvent(QTimerEvent *);
 
 private:
     /// Обновление информации о трассе

@@ -22,7 +22,7 @@ class PlayPause : public QWidget
     Q_OBJECT
 
 public:
-    explicit    PlayPause(Painter *_painter, Status *_status, QWidget *_parent = 0);
+    explicit    PlayPause(Painter *_painter, Status *_status, QWidget *_parent = nullptr);
     ~PlayPause();
 
 private slots:
@@ -48,7 +48,7 @@ private:
 
     /// Указатели на виджеты
     QPushButton     *pPlayPause;    /// Виджет кнопки запуска и остановки потока вычислений
-    QComboBox       *cDeltaTime;    /// Виджет регулирования времени между итерациями потока вычислений
+    QComboBox       *cSleepTime;    /// Виджет регулирования времени между итерациями потока вычислений
 
     /// --------------------------------------------------
     /// Указатели на объекты классов

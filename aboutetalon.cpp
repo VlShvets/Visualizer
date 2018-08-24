@@ -7,7 +7,8 @@ namespace Visualizer
 AboutEtalon::AboutEtalon(QWidget *_parent)
     : QScrollArea(_parent)
 {
-    labelNumber     = new QLabel(this);
+    labelNumber     = new QLabel("\t\t\t");
+
     labelAE         = new LabelAE;
 
     QWidget *pWidget = new QWidget(this);
@@ -56,32 +57,35 @@ AboutEtalon::AboutEtalon(QWidget *_parent)
     setWidget(pWidget);
 
     resetInfoAboutEtalon();
+
+    startTimer(ABOUT_INTERVAL);
 }
 
 AboutEtalon::~AboutEtalon()
 {
+    tPubEtalon = nullptr;
+
     delete labelAE;
     delete labelNumber;
 }
 
 /// Установка информации об эталоне
-void AboutEtalon::setInfoAboutEtalon(Etalon *_etalon, int _number)
+void AboutEtalon::setInfoAboutEtalon(TPubEtalon *_tPubEtalon, int _number)
 {
-    if(_etalon->getTPubEtalon() == NULL)
-    {
-        resetInfoAboutEtalon();
+    if(_tPubEtalon == nullptr)
         return;
-    }
 
-    tPubEtalon = _etalon->getTPubEtalon();
+    tPubEtalon = _tPubEtalon;
+    updateInfoAboutEtalon();
 
     labelNumber->setText(QString::number(_number));
-    updateInfoAboutEtalon();
 }
 
 /// Очистка всех полей информации об эталоне
 void AboutEtalon::resetInfoAboutEtalon()
 {
+    tPubEtalon = nullptr;
+
     labelNumber->setText(QString::number(0.0));
 
     labelAE->lV.setText(QString::number(0.0));
@@ -108,12 +112,24 @@ void AboutEtalon::resetInfoAboutEtalon()
 
 //    labelAE->lVisual.setText(QObject::tr("Нет"));
 //    labelAE->lImitObj.setText(QString::number(0.0));
-//    labelAE->lTrsChar.setText(QString::number(0.0));
+    //    labelAE->lTrsChar.setText(QString::number(0.0));
+}
+
+/// Обновление виджета отображения параметров эталона
+void AboutEtalon::timerEvent(QTimerEvent *)
+{
+    if(tPubEtalon == nullptr)
+        return;
+
+    updateInfoAboutEtalon();
 }
 
 /// Обновление информации об эталоне
 void AboutEtalon::updateInfoAboutEtalon()
 {
+    if(tPubEtalon == nullptr)
+        return;
+
     labelAE->lV.setText(QString::number(tPubEtalon->v));
     labelAE->lVx.setText(QString::number(tPubEtalon->vx));
     labelAE->lVy.setText(QString::number(tPubEtalon->vy));
@@ -143,8 +159,8 @@ void AboutEtalon::updateInfoAboutEtalon()
 //    temp.clear();
 
     labelAE->lTrustXY.setText(QString::number(tPubEtalon->trustXY));
-    labelAE->lIVO.setText(QString::number(tPubEtalon->IVO));
-    labelAE->lTVO.setText(QString::number(tPubEtalon->TVO));
+    labelAE->lIVO.setText(QString::number(tPubEtalon->IO));
+    labelAE->lTVO.setText(QString::number(tPubEtalon->TO));
     labelAE->lOGP.setText(QString::number(tPubEtalon->OGP));
     labelAE->lManevr.setText(tPubEtalon->manevr ? QObject::tr("Да") : QObject::tr("Нет"));
 

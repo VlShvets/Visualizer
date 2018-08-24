@@ -6,14 +6,18 @@ namespace Visualizer
 /// Класс виджета отрисовки эталонов и трасс
 Painter::Painter(AboutEtalon *_aboutEtalon, AboutTrack *_aboutTrack, GraphHeight *_graphHeight,
                  QWidget *_parent)
-    : Grapher2D(_parent), numberHighlightedEtalon(-1), numberSelectedEtalon(-1),
-    numberHighlightedTrack(-1), numberSelectedTrack(-1), bFixed(false),
-    aboutEtalon(_aboutEtalon), aboutTrack(_aboutTrack), graphHeight(_graphHeight)
+    : Grapher2D(_parent),
+      aboutEtalon(_aboutEtalon), aboutTrack(_aboutTrack), graphHeight(_graphHeight),
+      isVisibleOfAreas(true), isVisibleOfEtalons(true),
+      isVisibleOfAirTracks(true), isVisibleOfSurfaceTracks(true),
+      isVisibleOfGroupLeaders(false), isVisibleOfTrajectories(false)
 {
     setCSZoom(GEN_ZOOM);
     setCSAbsMeasure(XY_MEASURE);
     setCSOrdMeasure(XY_MEASURE);
     setMouseTracking(true);     /// Определение координат указателя мыши
+
+    clearing();
 
     startTimer(XY_INTERVAL);
 }
@@ -23,133 +27,60 @@ Painter::~Painter()
     clearing();
 }
 
+/// Установка указателя на словарь стационарных объектов
+//void Painter::setStationary(QMap<int, Stationary> &_stationary)
+//{
+//    stationary = &_stationary;
+//}
+
+/// Установка указателя на словарь эталонов
+void Painter::setEtalons(QMap <int, Etalon> &_etalons)
+{
+    etalons = &_etalons;
+
+    /// Отправка указателя на
+    if(graphHeight != nullptr)
+        graphHeight->setEtalons(_etalons);
+}
+
+/// Установка указателя на словарь воздушных трасс
+void Painter::setAirTracks(QMap <int, Track> &_airTracks)
+{
+    airTracks = &_airTracks;
+
+    if(graphHeight != nullptr)
+        graphHeight->setAirTracks(_airTracks);
+}
+
+/// Установка указателя на словарь поверхностных трасс
+void Painter::setSurfaceTracks(QMap <int, Track> &_surfaceTracks)
+{
+    surfaceTracks = &_surfaceTracks;
+}
+
 /// Очищение отрисовки
 void Painter::clearing()
 {
-//    stationary      = NULL;
-    etalons         = NULL;
-    airTracks       = NULL;
-    surfaceTrack    = NULL;
-}
+    /// Очищение указателей на словари параметров ЗКВ, эталонов и трасс
+//    stationary      = nullptr;
+    etalons         = nullptr;
+    airTracks       = nullptr;
+    surfaceTracks   = nullptr;
 
-/// Установка эталонов
-void Painter::setEtalons(TPubEtalon *_tPubEtalon, double _time)
-{
-//    /// Проверка на наличие флага о фиксации отображения
-//    if(bFixed)
-//        return;
+    /// Очищение номеров выделенных и выбранных эталонов и трасс
+    numberHighlightedEtalon = -1;
+    numberSelectedEtalon    = -1;
+    numberHighlightedTrack  = -1;
+    numberSelectedTrack     = -1;
 
-//    /// Определение колличества заполненых формуляров
-//    int size = 0;
-//    for(int i = BIUS_A100::UGEN_TRC_MAX; i > 0; --i)
-//    {
-//        if(_tPubEtalon[i].visual == BIUS_A100::_PTPV_::EU_YES)
-//        {
-//            size = i + 1;
-//            break;
-//        }
-//    }
+    /// Очищение виджета отображения параметров эталона
+    aboutEtalon->resetInfoAboutEtalon();
 
-//    /// Обновление информации об эталонах
-//    for(int i = 0; i < etalons.count(); ++i)
-//        etalons[i].setTPubEtalon(&_tPubEtalon[i], _time);
+    /// Очищение виджета отображения параметров трассы
+    aboutTrack->resetInfoAboutTrack();
 
-//    /// Добавление новых эталонов
-//    for(int i = etalons.count(); i < size; ++i)
-//        etalons.push_back(Etalon(&_tPubEtalon[i], _time));
-
-//    /// Удаление старых эталонов
-//    while(etalons.count() > size && !etalons.isEmpty())
-//        etalons.removeLast();
-
-//    /// Перерисовска символов эталонов
-//    for(int i = 0; i < etalons.count(); ++i)
-//        etalons[i].setSymbol();
-
-//    /// Обновление номера выделенного эталона
-//    if(getMCursorShape() != Qt::ClosedHandCursor)
-//    {
-//        numberHighlightedEtalon = indexOfEtalons(getMPosNoClick().x(), getMPosNoClick().y());
-
-//        /// Изменение вида курсора мыши
-//        if(numberHighlightedEtalon != -1 || numberHighlightedTrack != -1)
-//            setCursor(Qt::CursorShape(Qt::PointingHandCursor));
-//        else
-//            setCursor(Qt::CursorShape(getMCursorShape()));
-//    }
-
-//    /// Проверка существования выбранного эталона
-//    if(numberSelectedEtalon != -1 && numberSelectedEtalon < etalons.count())
-//    {
-//        /// Обновление отображения информации о выбранном эталоне
-//        ((AboutEtalon *)aboutEtalon->widget())->setInfoAboutEtalon(&etalons[numberSelectedEtalon], numberSelectedEtalon);
-//        ((GraphHeight *)graphHeight->widget())->setEtalon(&etalons[numberSelectedEtalon]);
-//    }
-//    else
-//    {
-//        ((AboutEtalon *)aboutEtalon->widget())->resetInfoAboutEtalon();
-//        ((GraphHeight *)graphHeight->widget())->delEtalon();
-//    }
-}
-
-/// Установка трасс
-void Painter::setTracks(PTPV_TGenTrc *_tGenTrc)
-{
-//    /// Проверка на наличие флага о фиксации отображения
-//    if(bFixed)
-//        return;
-
-//    /// Определение колличества заполненых формуляров
-//    int size = 0;
-//    for(int i = BIUS_A100::UGEN_TRC_MAX; i > 0; --i)
-//    {
-//        if(_tGenTrc[i].tXYUpdate != 0)
-//        {
-//            size = i + 1;
-//            break;
-//        }
-//    }
-
-//    /// Обновление информации об целях
-//    for(int i = 0; i < tracks.count(); ++i)
-//        tracks[i].setTGenTrc(&_tGenTrc[i]);
-
-//    /// Добавление новых целей
-//    for(int i = tracks.count(); i < size; ++i)
-//        tracks.push_back(Track(&_tGenTrc[i]));
-
-//    /// Удаление старых целей
-//    while(tracks.count() > size && !tracks.isEmpty())
-//        tracks.removeLast();
-
-//    /// Изменение символов целей
-//    for(int i = 0; i < tracks.count(); ++i)
-//        tracks[i].setSymbol();
-
-//    /// Обновление номера выделенной цели
-//    if(getMCursorShape() != Qt::ClosedHandCursor)
-//    {
-//        numberHighlightedTrack = indexOfTracks(getMPosNoClick().x(), getMPosNoClick().y());
-
-//        /// Изменение вида курсора мыши
-//        if(numberHighlightedEtalon != -1 || numberHighlightedTrack != -1)
-//            setCursor(Qt::CursorShape(Qt::PointingHandCursor));
-//        else
-//            setCursor(Qt::CursorShape(getMCursorShape()));
-//    }
-
-//    /// Проверка существования выбранной цели
-//    if(numberSelectedTrack != -1 && numberSelectedTrack < tracks.count())
-//    {
-//        /// Обновление отображения информации о выбранной цели
-//        ((AboutTrack *)aboutTrack->widget())->setInfoAboutTrack(&tracks[numberSelectedTrack], numberSelectedTrack);
-//        ((GraphHeight *)graphHeight->widget())->setTrack(&tracks[numberSelectedTrack]);
-//    }
-//    else
-//    {
-//        ((AboutTrack *)aboutTrack->widget())->resetInfoAboutTrack();
-//        ((GraphHeight *)graphHeight->widget())->delTrack();
-//    }
+    /// Очищение виджета отображения графика высоты
+    graphHeight->resetGraph();
 }
 
 /// События нажатия кнопки мыши
@@ -162,6 +93,8 @@ void Painter::mousePressEvent(QMouseEvent *_mEvent)
         setMCursorShape(Qt::ClosedHandCursor);
         setCursor(Qt::CursorShape(getMCursorShape()));
     }
+
+    repaint();
 }
 
 /// События перемещения мыши
@@ -188,31 +121,78 @@ void Painter::mouseReleaseEvent(QMouseEvent *_mEvent)
 {
     Grapher2D::mouseReleaseEvent(_mEvent);
 
-//    /// Выбор эталона
-//    if(numberHighlightedEtalon != -1)
-//    {
-//        if(numberHighlightedEtalon != numberSelectedEtalon)
-//        {
-//            numberSelectedEtalon = numberHighlightedEtalon;
+    /// Выбор эталона
+    if(etalons && isVisibleOfEtalons)
+    {
+        if(numberHighlightedEtalon != -1)
+        {
+            if(numberHighlightedEtalon != numberSelectedEtalon)
+            {
+                if(etalons->contains(numberHighlightedEtalon))
+                {
+                    numberSelectedEtalon = numberHighlightedEtalon;
 
-//            aboutEtalon->setInfoAboutEtalon(&etalons[numberSelectedEtalon], numberSelectedEtalon);
-//            graphHeight->setEtalon(&etalons[numberSelectedEtalon]);
-//        }
-//    }
+                    aboutEtalon->setInfoAboutEtalon((*etalons)[numberSelectedEtalon].getTPubEtalon(), numberSelectedEtalon);
+                    graphHeight->setEtalon(numberSelectedEtalon);
+                }
+            }
+        }
+    }
 
-//    /// Выбор цели
-//    if(numberHighlightedTrack != -1)
-//    {
-//        if(numberHighlightedTrack != numberSelectedTrack)
-//        {
-//            numberSelectedTrack = numberHighlightedTrack;
+    /// Выбор трассы
+    if(numberHighlightedTrack != -1)
+    {
+        if(numberHighlightedTrack != numberSelectedTrack)
+        {
+            /// Выбор воздушной трасс
+            if(numberHighlightedTrack < 1000)
+            {
+                if(airTracks && isVisibleOfAirTracks)
+                {
+                    if(airTracks->contains(numberHighlightedTrack))
+                    {
+                        numberSelectedTrack = numberHighlightedTrack;
 
-//            aboutTrack->setInfoAboutTrack(&tracks[numberSelectedTrack], numberSelectedTrack);
-//            graphHeight->setTrack(&tracks[numberSelectedTrack]);
-//        }
-//    }
+                        aboutTrack->setInfoAboutTrack((*airTracks)[numberSelectedTrack].getTGenTrc(), numberSelectedTrack);
+                        graphHeight->setAirTrack(numberSelectedTrack);
+                    }
+                }
+            }
+            /// Выбор поверхностной трассы
+            else
+            {
+                if(surfaceTracks && isVisibleOfSurfaceTracks)
+                {
+                    if(surfaceTracks->contains(numberHighlightedTrack - 1000))
+                    {
+                        numberSelectedTrack = numberHighlightedTrack;
 
-//    repaint();
+                        aboutTrack->setInfoAboutTrack((*surfaceTracks)[numberSelectedTrack - 1000].getTGenTrc(), numberSelectedTrack - 1000);
+                        graphHeight->resetGraph();
+                    }
+                }
+            }
+        }
+    }
+
+    repaint();
+}
+
+/// События двойного нажатия кнопки мыши
+void Painter::mouseDoubleClickEvent(QMouseEvent *_mEvent)
+{
+    /// Очищение номеров выделенных эталонов и трасс
+    numberSelectedEtalon    = -1;
+    numberSelectedTrack     = -1;
+
+    /// Очищение виджета отображения параметров эталона
+    aboutEtalon->resetInfoAboutEtalon();
+
+    /// Очищение виджета отображения параметров трассы
+    aboutTrack->resetInfoAboutTrack();
+
+    /// Очищение виджета отображения графика высоты
+    graphHeight->resetGraph();
 }
 
 /// События колеса мыши
@@ -223,356 +203,579 @@ void Painter::wheelEvent(QWheelEvent *_wEvent)
     /// Изменение технического масштаба символов
     Target::setScale(getCSAbsScale());
 
-//    /// Перерисовска символов эталонов
-//    for(int i = 0; i < etalons.count(); ++i)
-//        etalons[i].setSymbol();
+    /// Перерисовка символов эталонов
+    if(etalons && isVisibleOfEtalons)
+    {
+        QMap <int, Etalon>::iterator etalon = etalons->begin();
+        for(; etalon != etalons->end(); ++etalon)
+            etalon.value().setSymbol();
+    }
 
-//    /// Изменение символов целей
-//    for(int i = 0; i < tracks.count(); ++i)
-    //        tracks[i].setSymbol();
+    /// Изменение символов воздушных трасс
+    if(airTracks && isVisibleOfAirTracks)
+    {
+        QMap <int, Track>::iterator airTrack = airTracks->begin();
+        for(; airTrack != airTracks->end(); ++airTrack)
+            airTrack.value().setSymbol();
+    }
+
+    /// Изменение символов поверхностных трасс
+    if(surfaceTracks && isVisibleOfSurfaceTracks)
+    {
+        QMap <int, Track>::iterator surfaceTrack = surfaceTracks->begin();
+        for(; surfaceTrack != surfaceTracks->end(); ++surfaceTrack)
+            surfaceTrack.value().setSymbol();
+    }
+
+    repaint();
 }
 
 /// Обновление отрисокви
 void Painter::timerEvent(QTimerEvent *)
 {
+    /// Перерисовка символов эталонов
+    if(etalons && isVisibleOfEtalons)
+    {
+        QMap <int, Etalon>::iterator etalon = etalons->begin();
+        for(; etalon != etalons->end(); ++etalon)
+            etalon.value().setSymbol();
+    }
+
+    /// Перерисовка символов воздушных трасс
+    if(airTracks && isVisibleOfAirTracks)
+    {
+        QMap <int, Track>::iterator airTrack = airTracks->begin();
+        for(; airTrack != airTracks->end(); ++airTrack)
+            airTrack.value().setSymbol();
+    }
+
+    /// Перерисовка символов поверхностных трасс
+    if(surfaceTracks && isVisibleOfSurfaceTracks)
+    {
+        QMap <int, Track>::iterator surfaceTrack = surfaceTracks->begin();
+        for(; surfaceTrack != surfaceTracks->end(); ++surfaceTrack)
+            surfaceTrack.value().setSymbol();
+    }
+
+    /// Удаление отслеживаемого эталона с виджета отображения параметров эталона
+    if(numberSelectedEtalon != -1 && !etalons->contains(numberSelectedEtalon))
+        aboutEtalon->resetInfoAboutEtalon();
+
+
+    /// Удаление отслеживаемой трассы с виджета отображения параметров трассы
+    if(numberSelectedTrack != -1 && !airTracks->contains(numberSelectedTrack) && !surfaceTracks->contains(numberSelectedTrack - 1000))
+        aboutTrack->resetInfoAboutTrack();
+
     repaint();
 }
 
 /// Определение номера эталона под курсором мыши
 int Painter::indexOfEtalons(int _posX, int _posY)
 {
-//    int index = 0;
+    /// Определение номера эталона
+    if(etalons && isVisibleOfEtalons)
+    {
+        QMap <int, Etalon>::const_iterator etalon = etalons->constBegin();
+        for(; etalon != etalons->constEnd(); ++etalon)
+        {
+            if(etalon.value().containsPoint(QPoint(_posX - width() / 2 - getCSAbsShift(), _posY - height() / 2 - getCSOrdShift()),
+                                            Qt::WindingFill))
+            {
+                return etalon.key();
+            }
+        }
+    }
 
-//    for(;
-//        index < etalons.count() && !etalons[index].containsPoint(QPoint(_posX - width() / 2 - getCSAbsShift(),
-//                                                                        _posY - height() / 2 - getCSOrdShift()), Qt::WindingFill);
-//        ++index) {}
-
-//    if(index != etalons.count())
-//        return index;
-//    else
-//        return -1;
+    return -1;
 }
 
 /// Определение номера трассы под курсором мыши
 int Painter::indexOfTracks(int _posX, int _posY)
 {
-//    int index = 0;
+    /// Определение номера воздушной трассы
+    if(airTracks && isVisibleOfAirTracks)
+    {
+        QMap <int, Track>::const_iterator airTrack = airTracks->constBegin();
+        for(; airTrack != airTracks->constEnd(); ++airTrack)
+        {
+            if(airTrack.value().containsPoint(QPoint(_posX - width() / 2 - getCSAbsShift(), _posY - height() / 2 - getCSOrdShift()),
+                                              Qt::WindingFill))
+            {
+                return airTrack.key();
+            }
+        }
+    }
 
-//    for(;
-//        index < tracks.count() && !tracks[index].containsPoint(QPoint(_posX - width() / 2 - getCSAbsShift(),
-//                                                                        _posY - height() / 2 - getCSOrdShift()), Qt::WindingFill);
-//        ++index) {}
+    /// Определение номера поверхностной трассы
+    if(surfaceTracks && isVisibleOfSurfaceTracks)
+    {
+        QMap <int, Track>::const_iterator surfaceTrack = surfaceTracks->constBegin();
+        for(; surfaceTrack != surfaceTracks->constEnd(); ++surfaceTrack)
+        {
+            if(surfaceTrack.value().containsPoint(QPoint(_posX - width() / 2 - getCSAbsShift(), _posY - height() / 2 - getCSOrdShift()),
+                                                  Qt::WindingFill))
+            {
+                return 1000 + surfaceTrack.key();
+            }
+        }
+    }
 
-//    if(index != tracks.count())
-//        return index;
-//    else
-//        return -1;
+    return -1;
 }
 
 /// Отрисовка эталонов и трасс
 void Painter::paintEvent(QPaintEvent *_pEvent)
 {
-//    QPainter p(this);
-//    p.translate(getCSAbsTranslate(), getCSOrdTranslate());
-//    p.scale(getCSAbsScale(), getCSOrdScale());
+    QPainter p(this);
+    p.translate(getCSAbsTranslate(), getCSOrdTranslate());
+    p.scale(getCSAbsScale(), getCSOrdScale());
 
-//    /// Карта
-//    QPixmap map(":/map/0.jpg");
-//    p.save();
-//    p.scale(1.0, -1.0);
-//    p.drawPixmap(QRect(- map.width() / 2.0 * 75.0 - 456125.0, - map.height() / 2.0 * 75.0 + 327075.0, map.width() * 75.0, map.height() * 75.0), map);
-//    p.restore();
+    /// Карта
+    QPixmap map(":/map/0.jpg");
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(QRect(- map.width() / 2.0 * 75.0 - 456125.0, - map.height() / 2.0 * 75.0 + 327075.0, map.width() * 75.0, map.height() * 75.0), map);
+    p.restore();
 
-//    /// Координатные оси
-//    p.save();
-//    Grapher2D::paintEvent(_pEvent);
-//    p.restore();
+    /// Координатные оси
+    p.save();
+    Grapher2D::paintEvent(_pEvent);
+    p.restore();
 
-//    QPen pen;
-//    pen.setCosmetic(true);
+    QPen pen;
+    pen.setCosmetic(true);
 
-//    /// Командные пункты
+    /// --------------------------------------------------
 
-//    QPixmap pic;
-//    QRect rect;
+    /// Командные пункты
 
-//    /// Свой командный пункт №1 (Ростов)
-//    pic.load(":/pic/fr/cc/0.png");
-//    rect.setRect(CC_FR_1_X, CC_FR_1_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
-//    p.save();
-//    p.scale(1.0, -1.0);
-//    p.drawPixmap(rect, pic);
-//    p.restore();
-//    pic.load(":/pic/fr/cc/1.png");
-//    rect.setRect(CC_FR_1_X, CC_FR_1_Y + 1.6 * pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
-//    p.save();
-//    p.scale(1.0, -1.0);
-//    p.drawPixmap(rect, pic);
-//    p.restore();
+    QPixmap pic;
+    QRect rect;
 
-//    /// Свой командный пункт №2 (Севастополь)
-//    pic.load(":/pic/fr/cc/0.png");
-//    rect.setRect(CC_FR_2_X, - CC_FR_2_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
-//    p.save();
-//    p.scale(1.0, -1.0);
-//    p.drawPixmap(rect, pic);
-//    p.restore();
-//    pic.load(":/pic/fr/cc/2.png");
-//    rect.setRect(CC_FR_2_X, - CC_FR_2_Y + 1.6 * pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
-//    p.save();
-//    p.scale(1.0, -1.0);
-//    p.drawPixmap(rect, pic);
-//    p.restore();
+    /// Свой командный пункт №1 (Ростов)
+    pic.load(":/pic/fr/cc/0.png");
+    rect.setRect(CC_FR_1_X, CC_FR_1_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
+    pic.load(":/pic/fr/cc/1.png");
+    rect.setRect(CC_FR_1_X, CC_FR_1_Y + 1.6 * pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
-//    /// Свой командный пункт №3 (Феодосия)
-//    pic.load(":/pic/fr/cc/2.png");
-//    rect.setRect(CC_FR_3_X, - CC_FR_3_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
-//    p.save();
-//    p.scale(1.0, -1.0);
-//    p.drawPixmap(rect, pic);
-//    p.restore();
+    /// Свой командный пункт №2 (Севастополь)
+    pic.load(":/pic/fr/cc/0.png");
+    rect.setRect(CC_FR_2_X, - CC_FR_2_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
+    pic.load(":/pic/fr/cc/2.png");
+    rect.setRect(CC_FR_2_X, - CC_FR_2_Y + 1.6 * pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
-//    /// Свой командный пункт №4 (Армянск)
-//    pic.load(":/pic/fr/cc/2.png");
-//    rect.setRect(CC_FR_4_X, - CC_FR_4_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
-//    p.save();
-//    p.scale(1.0, -1.0);
-//    p.drawPixmap(rect, pic);
-//    p.restore();
+    /// Свой командный пункт №3 (Феодосия)
+    pic.load(":/pic/fr/cc/2.png");
+    rect.setRect(CC_FR_3_X, - CC_FR_3_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
-//    /// Чужой командный пункт №1
-//    pic.load(":/pic/al/cc/0.png");
-//    rect.setRect(CC_AL_1_X, - CC_AL_1_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
-//    p.save();
-//    p.scale(1.0, -1.0);
-//    p.drawPixmap(rect, pic);
-//    p.restore();
+    /// Свой командный пункт №4 (Армянск)
+    pic.load(":/pic/fr/cc/2.png");
+    rect.setRect(CC_FR_4_X, - CC_FR_4_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
-//    /// Чужой командный пункт №2
-//    pic.load(":/pic/al/ap/0.png");
-//    rect.setRect(CC_AL_2_X - 0.5 * pic.width() / getCSAbsScale(), - CC_AL_2_Y + 0.5 * pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
-//    p.save();
-//    p.scale(1.0, -1.0);
-//    p.drawPixmap(rect, pic);
-//    p.restore();
+    /// Чужой командный пункт №1
+    pic.load(":/pic/al/cc/0.png");
+    rect.setRect(CC_AL_1_X, - CC_AL_1_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
-//    /// Чужой командный пункт №3
-//    pic.load(":/pic/al/cc/0.png");
-//    rect.setRect(CC_AL_3_X, - CC_AL_3_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
-//    p.save();
-//    p.scale(1.0, -1.0);
-//    p.drawPixmap(rect, pic);
-//    p.restore();
+    /// Чужой командный пункт №2
+    pic.load(":/pic/al/ap/0.png");
+    rect.setRect(CC_AL_2_X - 0.5 * pic.width() / getCSAbsScale(), - CC_AL_2_Y + 0.5 * pic.height() / getCSOrdScale(),
+                 pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
-//    /// Зоны видимости
+    /// Чужой командный пункт №3
+    pic.load(":/pic/al/cc/0.png");
+    rect.setRect(CC_AL_3_X, - CC_AL_3_Y + pic.height() / getCSOrdScale(), pic.width() / getCSAbsScale(), pic.height() / -getCSOrdScale());
+    p.save();
+    p.scale(1.0, -1.0);
+    p.drawPixmap(rect, pic);
+    p.restore();
 
-//    p.save();
-//    pen.setColor(Qt::GlobalColor(CLR_LINE_AREA));
-//    pen.setWidth(WDT_AREA);
-//    p.setPen(pen);
-//    QColor clr(Qt::GlobalColor(CLR_AREA));
-//    clr.setAlpha(ALPHA_AREA);
-//    p.setBrush(QBrush(clr));
-//    p.drawEllipse(AREA_1_X - AREA_1_R, AREA_1_Y - AREA_1_R, 2 * AREA_1_R, 2 * AREA_1_R);
-//    p.drawEllipse(AREA_2_X - AREA_2_R, AREA_2_Y - AREA_2_R, 2 * AREA_2_R, 2 * AREA_2_R);
-//    p.restore();
+    /// --------------------------------------------------
 
-//    /// --------------------------------------------------
+    /// Стационарные зоны видимости
 
-//    /// Эталоны
+    if(isVisibleOfAreas)
+    {
+        p.save();
+        pen.setColor(Qt::GlobalColor(CLR_LINE_AREA));
+        pen.setWidth(WDT_AREA);
+        p.setPen(pen);
+        QColor clr(Qt::GlobalColor(CLR_AREA));
+        clr.setAlpha(ALPHA_AREA);
+        p.setBrush(QBrush(clr));
+        p.drawEllipse(AREA_1_X - AREA_1_R, AREA_1_Y - AREA_1_R, 2 * AREA_1_R, 2 * AREA_1_R);
+        p.drawEllipse(AREA_2_X - AREA_2_R, AREA_2_Y - AREA_2_R, 2 * AREA_2_R, 2 * AREA_2_R);
+        p.restore();
+    }
 
-//    for(int i = 1; i < etalons.count(); ++i)
-//    {
-//        if(etalons[i].getTPubEtalon() != NULL)
-//        {
-//            /// Отрисовка истории
-//            for(int j = 1; j < etalons[i].getCountPoints(); ++j)
-//            {
-//                /// Отрисовка местоположений
-//                pen.setColor(Qt::GlobalColor(CLR_ETALON));
-//                pen.setWidth(WDT_MEMORY_POINT);
-//                p.setPen(pen);
-//                p.drawPoint(etalons[i].getMemoryCoord(j));
+    /// --------------------------------------------------
 
-//                /// Отрисовка траекторий
-//                pen.setWidth(WDT_PATH);
-//                p.setPen(pen);
-//                p.drawLine(etalons[i].getMemoryCoord(j - 1), etalons[i].getMemoryCoord(j));
-//            }
+    /// Эталоны
 
-//            /// Отрисовка эталонов
+    if(etalons != nullptr && isVisibleOfEtalons)
+    {
+        QMap <int, Etalon>::const_iterator etalon = etalons->constBegin();
+        for(; etalon != etalons->constEnd(); ++etalon)
+        {
+            if(etalon.value().getTPubEtalon() != nullptr)
+            {
+                /// Отрисовка траекторий
+                if(isVisibleOfTrajectories)
+                {
+                    for(int j = 1; j < etalon.value().getTrajectoryCount(); ++j)
+                    {
+                        /// Отрисовка местоположений
+                        pen.setColor(Qt::GlobalColor(CLR_ETALON));
+                        pen.setWidth(WDT_TRAJECTORY_POINT);
+                        p.setPen(pen);
+                        p.drawPoint(etalon.value().getTrajectoryCoord(j));
 
-//            p.scale(1.0 / getCSAbsScale(), 1.0 / getCSOrdScale());
+                        /// Отрисовка траекторий
+                        pen.setWidth(WDT_TRAJECTORY);
+                        p.setPen(pen);
+                        p.drawLine(etalon.value().getTrajectoryCoord(j - 1), etalon.value().getTrajectoryCoord(j));
+                    }
+                }
 
-//            /// Отрисовка выделения при выборе
-//            if(i == numberSelectedEtalon)
-//            {
-//                p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
-//                p.drawPoint(etalons[i].at(0));
-//            }
+                /// Отрисовка эталонов
 
-//            /// Отрисовка выделения при наведении
-//            if(i == numberHighlightedEtalon)
-//            {
-//                p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
-//                p.drawPoint(etalons[i].at(0));
-//            }
+                p.scale(1.0 / getCSAbsScale(), 1.0 / getCSOrdScale());
 
-//            p.setPen(QPen(Qt::GlobalColor(CLR_ETALON), WDT_LAST_POINT));
-//            p.drawPoint(etalons[i].at(0));
+                /// Отрисовка выделения при выборе
+                if(etalon.key() == numberSelectedEtalon)
+                {
+                    p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
+                    p.drawPolygon(etalon.value());
+                }
 
-//            /// Отрисовка векторов скоростей
+                /// Отрисовка выделения при наведении
+                if(etalon.key() == numberHighlightedEtalon)
+                {
+                    p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
+                    p.drawPolygon(etalon.value());
+                }
 
-//            /// Отрисовка выделения при выборе
-//            if(i == numberSelectedEtalon)
-//            {
-//                p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
-//                p.drawPolygon(etalons[i]);
-//            }
+                p.setPen(QPen(Qt::GlobalColor(CLR_ETALON), WDT_ARROW));
+                p.drawPolygon(etalon.value());
 
-//            /// Отрисовка выделения при наведении
-//            if(i == numberHighlightedEtalon)
-//            {
-//                p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
-//                p.drawPolygon(etalons[i]);
-//            }
+                p.scale(getCSAbsScale(), getCSOrdScale());
+            }
+        }
+    }
 
-//            p.setPen(QPen(Qt::GlobalColor(CLR_ETALON), WDT_ARROW));
-//            p.drawPolygon(etalons[i]);
+    /// --------------------------------------------------
 
-//            p.scale(getCSAbsScale(), getCSOrdScale());
-//        }
-//    }
+    /// Воздушные трассы
 
-//    /// --------------------------------------------------
+    if(airTracks != nullptr && isVisibleOfAirTracks)
+    {
+        QMap <int, Track>::const_iterator airTrack = airTracks->constBegin();
+        for(; airTrack != airTracks->constEnd(); ++airTrack)
+        {
+            if(airTrack.value().getTGenTrc() != nullptr)
+            {
+                if(!isVisibleOfGroupLeaders || airTrack.value().getTGenTrc()->grpInfo.trcCount > 0)
+                {
+                    /// Отрисовка подвижных зон видимости
+                    if(isVisibleOfAreas)
+                    {
+                        p.save();
+                        pen.setColor(Qt::GlobalColor(CLR_LINE_MOVE_AREA));
+                        pen.setWidth(WDT_AREA);
+                        p.setPen(pen);
+                        QColor clr(Qt::GlobalColor(CLR_MOVE_AREA));
+                        clr.setAlpha(ALPHA_AREA);
+                        p.setBrush(QBrush(clr));
+                        switch(airTrack.value().getTGenTrc()->TO)
+                        {
+                        case 17:
+                        {
+                            p.drawEllipse(airTrack.value().getTrajectoryCoord(0).x() - AREA_17_R,
+                                          airTrack.value().getTrajectoryCoord(0).y() - AREA_17_R, 2 * AREA_17_R, 2 * AREA_17_R);
+                        }
+                            break;
+                        case 51:
+                        {
+                            p.drawEllipse(airTrack.value().getTrajectoryCoord(0).x() - AREA_51_R,
+                                          airTrack.value().getTrajectoryCoord(0).y() - AREA_51_R, 2 * AREA_51_R, 2 * AREA_51_R);
+                        }
+                            break;
+                        case 53:
+                        {
+                            p.drawEllipse(airTrack.value().getTrajectoryCoord(0).x() - AREA_53_R,
+                                          airTrack.value().getTrajectoryCoord(0).y() - AREA_53_R, 2 * AREA_53_R, 2 * AREA_53_R);
+                        }
+                            break;
+                        default:
+                            break;
 
-//    /// Трассы
+                        }
+                        p.restore();
+                    }
 
-//    for(int i = 0; i < tracks.count(); ++i)
-//    {
-//        if(tracks[i].getTGenTrc() != NULL)
-//        {
-//            /// Отрисовка истории
-//            for(int j = 1; j < tracks[i].getCountPoints(); ++j)
-//            {
-//                /// Отрисовка местоположений
-//                if(tracks[i].getTGenTrc()->OGP == 1)
-//                {
-//                    if(tracks[i].getMemorySensCount(j) > 1.0)
-//                        pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));
-//                    else
-//                        pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));
-//                }
-//                else
-//                {
-//                    if(tracks[i].getMemorySensCount(j) > 1.0)
-//                        pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));
-//                    else
-//                        pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));
-//                }
-//                pen.setWidth(WDT_MEMORY_POINT);
-//                p.setPen(pen);
-//                p.drawPoint(tracks[i].getMemoryCoord(j));
+                    /// Отрисовка траекторий
+                    if(isVisibleOfTrajectories)
+                    {
+                        for(int j = 1; j < airTrack.value().getTrajectoryCount(); ++j)
+                        {
+                            /// Отрисовка местоположений
+                            if(airTrack.value().getTGenTrc()->OGP == 1)
+                            {
+                                if(airTrack.value().getTrajectorySensCount(j) > 1.0)
+                                    pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));
+                                else
+                                    pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));
+                            }
+                            else
+                            {
+                                if(airTrack.value().getTrajectorySensCount(j) > 1.0)
+                                    pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));
+                                else
+                                    pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));
+                            }
+                            pen.setWidth(WDT_TRAJECTORY_POINT);
+                            p.setPen(pen);
+                            p.drawPoint(airTrack.value().getTrajectoryCoord(j));
 
-//                /// Отрисовка траекторий
-//                pen.setWidth(WDT_PATH);
-//                p.setPen(pen);
-//                p.drawLine(tracks[i].getMemoryCoord(j - 1), tracks[i].getMemoryCoord(j));
-//            }
+                            /// Отрисовка траекторий
+                            pen.setWidth(WDT_TRAJECTORY);
+                            p.setPen(pen);
+                            p.drawLine(airTrack.value().getTrajectoryCoord(j - 1), airTrack.value().getTrajectoryCoord(j));
+                        }
+                    }
 
-//            /// Отрисовка зон видимости
-//            p.save();
-//            pen.setColor(Qt::GlobalColor(CLR_LINE_MOVE_AREA));
-//            pen.setWidth(WDT_AREA);
-//            p.setPen(pen);
-//            QColor clr(Qt::GlobalColor(CLR_MOVE_AREA));
-//            clr.setAlpha(ALPHA_AREA);
-//            p.setBrush(QBrush(clr));
-//            switch(tracks[i].getTGenTrc()->TVO)
-//            {
-//            case 17:
-//                p.drawEllipse(tracks[i].getMemoryCoord(0).x() - AREA_17_R, tracks[i].getMemoryCoord(0).y() - AREA_17_R, 2 * AREA_17_R, 2 * AREA_17_R);
-//                break;
-//            case 51:
-//                p.drawEllipse(tracks[i].getMemoryCoord(0).x() - AREA_51_R, tracks[i].getMemoryCoord(0).y() - AREA_51_R, 2 * AREA_51_R, 2 * AREA_51_R);
-//                break;
-//            case 53:
-//                p.drawEllipse(tracks[i].getMemoryCoord(0).x() - AREA_53_R, tracks[i].getMemoryCoord(0).y() - AREA_53_R, 2 * AREA_53_R, 2 * AREA_53_R);
-//                break;
-//            default:
-//                break;
+                    /// Отрисовка трасс
 
-//            }
-//            p.restore();
+                    p.scale(1.0 / getCSAbsScale(), 1.0 / getCSOrdScale());
 
-//            /// Отрисовка трасс
+                    /// Отрисовка лидеров групп
+                    if(isVisibleOfGroupLeaders)
+                    {
+                        QString str = QString::number(airTrack.value().getTGenTrc()->grpInfo.num) + ", " +
+                                      QString::number(airTrack.value().getTGenTrc()->grpInfo.trcCount);
+                        p.drawText(airTrack.value().at(0) - QPoint(20, 5), str);
+                    }
 
-//            p.scale(1.0 / getCSAbsScale(), 1.0 / getCSOrdScale());
+                    /// Отрисовка выделения при выборе
+                    if(airTrack.key() == numberSelectedTrack)
+                    {
+                        p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
+                        p.drawPolygon(airTrack.value());
+                    }
 
-//            /// Отрисовка выделения при выборе
-//            if(i == numberSelectedTrack)
-//            {
-//                p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
-//                p.drawPoint(tracks[i].at(0));
-//            }
+                    /// Отрисовка выделения при наведении
+                    if(airTrack.key() == numberHighlightedTrack)
+                    {
+                        p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
+                        p.drawPolygon(airTrack.value());
+                    }
 
-//            /// Отрисовка выделения при наведении
-//            if(i == numberHighlightedTrack)
-//            {
-//                p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
-//                p.drawPoint(tracks[i].at(0));
-//            }
+                    if(airTrack.value().getTGenTrc()->OGP == 1)
+                    {
+                        if(airTrack.value().getTGenTrc()->sensCount > 1.0)
+                            pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));
+                        else
+                            pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));
+                    }
+                    else
+                    {
+                        if(airTrack.value().getTGenTrc()->sensCount > 1.0)
+                            pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));
+                        else
+                            pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));
+                    }
 
-//            if(tracks[i].getTGenTrc()->sensCount > 1.0)
-//                p.setPen(QPen(Qt::GlobalColor(CLR_TRUE_FR_TRACK), WDT_LAST_POINT));
-//            else
-//                p.setPen(QPen(Qt::GlobalColor(CLR_FR_TRACK), WDT_LAST_POINT));
-//            p.drawPoint(tracks[i].at(0));
+                    pen.setWidth(WDT_ARROW);
+                    p.setPen(pen);
+                    p.drawPolygon(airTrack.value());
 
-//            if(Track::isGroup())
-//            {
-//                QString str = QString::number(tracks[i].getTGenTrc()->grpInfo.num) + ", " + QString::number(tracks[i].getTGenTrc()->grpInfo.trcCount);
-//                p.drawText(tracks[i].at(0) - QPoint(20, 5), str);
-//            }
+                    p.scale(getCSAbsScale(), getCSOrdScale());
+                }
+            }
+        }
+    }
 
-//            /// Отрисовка выделения при выборе
-//            if(i == numberSelectedTrack)
-//            {
-//                p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
-//                p.drawPolygon(tracks[i]);
-//            }
+    /// --------------------------------------------------
 
-//            /// Отрисовка выделения при наведении
-//            if(i == numberHighlightedTrack)
-//            {
-//                p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
-//                p.drawPolygon(tracks[i]);
-//            }
+    /// Поверхностные трассы
 
-//            if(tracks[i].getTGenTrc()->OGP == 1)
-//            {
-//                if(tracks[i].getTGenTrc()->sensCount > 1.0)
-//                    pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));
-//                else
-//                    pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));
-//            }
-//            else
-//            {
-//                if(tracks[i].getTGenTrc()->sensCount > 1.0)
-//                    pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));
-//                else
-//                    pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));
-//            }
-//            pen.setWidth(WDT_ARROW);
-//            p.setPen(pen);
-//            p.drawPolygon(tracks[i]);
+    if(surfaceTracks != nullptr && isVisibleOfSurfaceTracks)
+    {
+        QMap <int, Track>::const_iterator surfaceTrack = surfaceTracks->constBegin();
+        for(; surfaceTrack != surfaceTracks->constEnd(); ++surfaceTrack)
+        {
+            if(surfaceTrack.value().getTGenTrc() != nullptr)
+            {
+                if(!isVisibleOfGroupLeaders || surfaceTrack.value().getTGenTrc()->grpInfo.trcCount > 0)
+                {
+                    /// Отрисовка подвижных зон видимости
+                    if(isVisibleOfAreas)
+                    {
+                        p.save();
+                        pen.setColor(Qt::GlobalColor(CLR_LINE_MOVE_AREA));
+                        pen.setWidth(WDT_AREA);
+                        p.setPen(pen);
+                        QColor clr(Qt::GlobalColor(CLR_MOVE_AREA));
+                        clr.setAlpha(ALPHA_AREA);
+                        p.setBrush(QBrush(clr));
+                        switch(surfaceTrack.value().getTGenTrc()->TO)
+                        {
+                        case 17:
+                        {
+                            p.drawEllipse(surfaceTrack.value().getTrajectoryCoord(0).x() - AREA_17_R,
+                                          surfaceTrack.value().getTrajectoryCoord(0).y() - AREA_17_R, 2 * AREA_17_R, 2 * AREA_17_R);
+                        }
+                            break;
+                        case 51:
+                        {
+                            p.drawEllipse(surfaceTrack.value().getTrajectoryCoord(0).x() - AREA_51_R,
+                                          surfaceTrack.value().getTrajectoryCoord(0).y() - AREA_51_R, 2 * AREA_51_R, 2 * AREA_51_R);
+                        }
+                            break;
+                        case 53:
+                        {
+                            p.drawEllipse(surfaceTrack.value().getTrajectoryCoord(0).x() - AREA_53_R,
+                                          surfaceTrack.value().getTrajectoryCoord(0).y() - AREA_53_R, 2 * AREA_53_R, 2 * AREA_53_R);
+                        }
+                            break;
+                        default:
+                            break;
 
-//            p.scale(getCSAbsScale(), getCSOrdScale());
-//        }
-//    }
+                        }
+                        p.restore();
+                    }
 
-//    p.end();
+                    /// Отрисовка траекторий
+                    if(isVisibleOfTrajectories)
+                    {
+                        for(int j = 1; j < surfaceTrack.value().getTrajectoryCount(); ++j)
+                        {
+                            /// Отрисовка местоположений
+                            if(surfaceTrack.value().getTGenTrc()->OGP == 1)
+                            {
+                                if(surfaceTrack.value().getTrajectorySensCount(j) > 1.0)
+                                    pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));
+                                else
+                                    pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));
+                            }
+                            else
+                            {
+                                if(surfaceTrack.value().getTrajectorySensCount(j) > 1.0)
+                                    pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));
+                                else
+                                    pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));
+                            }
+                            pen.setWidth(WDT_TRAJECTORY_POINT);
+                            p.setPen(pen);
+                            p.drawPoint(surfaceTrack.value().getTrajectoryCoord(j));
+
+                            /// Отрисовка траекторий
+                            pen.setWidth(WDT_TRAJECTORY);
+                            p.setPen(pen);
+                            p.drawLine(surfaceTrack.value().getTrajectoryCoord(j - 1), surfaceTrack.value().getTrajectoryCoord(j));
+                        }
+                    }
+
+                    /// Отрисовка трасс
+
+                    p.scale(1.0 / getCSAbsScale(), 1.0 / getCSOrdScale());
+
+                    if(surfaceTrack.value().getTGenTrc()->OGP == 1)
+                    {
+                        if(surfaceTrack.value().getTGenTrc()->sensCount > 1.0)
+                            p.setPen(QPen(Qt::GlobalColor(CLR_TRUE_AL_TRACK)));
+                        else
+                            p.setPen(QPen(Qt::GlobalColor(CLR_AL_TRACK)));
+                    }
+                    else
+                    {
+                        if(surfaceTrack.value().getTGenTrc()->sensCount > 1.0)
+                            p.setPen(QPen(Qt::GlobalColor(CLR_TRUE_FR_TRACK)));
+                        else
+                            p.setPen(QPen(Qt::GlobalColor(CLR_FR_TRACK)));
+                    }
+
+                    p.drawPoint(surfaceTrack.value().at(0));
+
+                    /// Отрисовка лидеров групп
+                    if(isVisibleOfGroupLeaders)
+                    {
+                        QString str = QString::number(surfaceTrack.value().getTGenTrc()->grpInfo.num) + ", " +
+                                QString::number(surfaceTrack.value().getTGenTrc()->grpInfo.trcCount);
+                        p.drawText(surfaceTrack.value().at(0) - QPoint(20, 5), str);
+                    }
+
+                    /// Отрисовка выделения при выборе
+                    if(surfaceTrack.key() == numberSelectedTrack - 1000)
+                    {
+                        p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
+                        p.drawPolygon(surfaceTrack.value());
+                    }
+
+                    /// Отрисовка выделения при наведении
+                    if(surfaceTrack.key() == numberHighlightedTrack - 1000)
+                    {
+                        p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
+                        p.drawPolygon(surfaceTrack.value());
+                    }
+
+                    if(surfaceTrack.value().getTGenTrc()->OGP == 1)
+                    {
+                        if(surfaceTrack.value().getTGenTrc()->sensCount > 1.0)
+                            pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));
+                        else
+                            pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));
+                    }
+                    else
+                    {
+                        if(surfaceTrack.value().getTGenTrc()->sensCount > 1.0)
+                            pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));
+                        else
+                            pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));
+                    }
+
+                    pen.setWidth(WDT_ARROW);
+                    p.setPen(pen);
+                    p.drawPolygon(surfaceTrack.value());
+
+                    p.scale(getCSAbsScale(), getCSOrdScale());
+                }
+            }
+        }
+    }
+
+    p.end();
 }
 
 }
