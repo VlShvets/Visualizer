@@ -4,14 +4,18 @@ namespace Visualizer
 {
 
 /// Класс главного потока вычислений
-MainThread::MainThread(Painter *_painter, Status *_status, const QString _deltaTime)
+MainThread::MainThread(Painter *_painter, Status *_status, DataBaseWidget *_dataBaseWidget, const QString _deltaTime) //
     : painter(_painter), status(_status), sleepTime(_deltaTime.toInt()),
-      isCompleted(false), isPause(false)
+      isCompleted(false), isPause(false), dataBaseWidget(_dataBaseWidget)
 {
     imitation                   = new Imitation;
     preliminaryProcessingOfData = new PreliminaryProcessingOfData;
     tertiaryProcessingOfData    = new TertiaryProcessingOfData;
+    dbThread                    = new DbThread(dataBaseWidget);
 
+    connect(this, SIGNAL(signalInDb(int, int, int, int)), dbThread, SLOT(operationWithDb(int, int, int, int)));
+
+    dbThread->start();
     /// --------------------------------------------------
     /// Имитация
     /// --------------------------------------------------
@@ -89,7 +93,21 @@ MainThread::~MainThread()
     etalons         = nullptr;
     airTracks       = nullptr;
     surfaceTracks   = nullptr;
+
+    completeOfThreadDb();
 }
+
+void MainThread::completeOfThreadDb()
+{
+    if(dbThread == nullptr)
+        return;
+
+    //dbThread->complete();
+    dbThread->wait();
+    delete dbThread;
+    dbThread = nullptr;
+}
+
 
 /// Поток вычислений
 void MainThread::run()
@@ -106,7 +124,7 @@ void MainThread::run()
             msleep(PAUSE_T);
             continue;
         }
-
+        ///Время между итерациями потока вычисления
         msleep(sleepTime);
 
         time += DELTA_T;
@@ -121,6 +139,14 @@ void MainThread::run()
         /// Третичная обработка данных
         tertiaryProcessingOfData->run(count, time);
 
+        /// Сигнал отправляемый в другой поток для проверки обьектов в БД
+        QMap<int, Track>::const_iterator seaTarget = surfaceTracks->begin();
+        for(;seaTarget != surfaceTracks->end(); ++seaTarget){
+            if(seaTarget.value().getTGenTrc()->objClass == UOC_SEA){
+                emit signalInDb(seaTarget.value().getTGenTrc()->y, seaTarget.value().getTGenTrc()->x, time, seaTarget.key());
+            }
+        }
+
         /// Определение количества воздушных объектов
         status->showInfo(AirTrack, airTracks->count());
 
@@ -131,5 +157,6 @@ void MainThread::run()
         count = 0;
     }
 }
+
 
 }

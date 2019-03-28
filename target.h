@@ -7,6 +7,9 @@
 #include "define.h"
 
 #include <QPolygon>
+#include <QPainter>
+#include <QString>
+#include <QPixmap>
 
 namespace  Visualizer
 {
@@ -16,7 +19,7 @@ using namespace IMIT_;
 using namespace _PTPV_;
 
 /// Класс параметров целей
-class Target : public QPolygon
+class Target : public QPolygon, public QPixmap
 {
 public:
     Target();
@@ -29,7 +32,13 @@ public:
     /// Установка символа
     virtual void        setSymbol() = 0;
 
-    /// Получение координаты точки траетории
+    //virtual void        setPath() = 0;
+
+    void                setPolygon();
+
+    //void
+
+    /// Получение координаты точки траектории
     const QPointF       getTrajectoryCoord(int _index) const;
 
     /// Получение высоты точки траектории
@@ -41,11 +50,18 @@ public:
     /// Получение количества источников сопровождения точки траектории
     int                 getTrajectorySensCount(int _index) const;
 
+    /// Получение ОГП точки траектории
+    int                 getTrajectoryOGP(int _index) const;
+
     /// Получение количества точек траектории
     inline int          getTrajectoryCount() const;
 
     /// Очистка массива точек траектории
     inline void         clearTrajectory();
+
+    inline void setRect(const QRect _rect) {rect = _rect; }
+    inline QRect getRect() const { return rect; }
+    inline QString getPathImg() const {return pathImg; }
 
 protected:
     /// Установка символа Гипер Звукового Летательного аппарата (Hypersonic aircraft)
@@ -78,8 +94,11 @@ protected:
         float h;        /// Радиолокационная высoта
         float time;     /// Время
         int sensCount;  /// Количество источников сопpовождения
+        EUOGP OGP;      /// ОГП
     };
     QVector <Trajectory>    trajectory;    /// Динамический массив точек траектории
+    QRect rect;
+    QString pathImg;
 };
 
 /// Установка масштаба символа
@@ -148,7 +167,7 @@ public:
     /// Установка структуры данных трассы
     void setTGenTrc(PTPV_TGenTrc *_tGenTrc);
 
-    /// Получение структуры данных трассы
+    /// Получение структуры данных трассы. Метод, возвращает указатель на обьект PTPV_TGenTrc *.
     inline PTPV_TGenTrc *getTGenTrc() const;
 
     /// Сохранение текущей трассы в массив точек траектории

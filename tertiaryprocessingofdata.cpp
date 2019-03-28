@@ -83,6 +83,7 @@ void TertiaryProcessingOfData::run(const int _count, const float _currentTime)
                 if(tMsgFormSetSurface.genTrcMsg[j])
                     tGenTrcSurface[tGenTrcMsg[j].genTrcNum] = tGenTrcMsg[j].trc;
             }
+
         }
             break;
         default:

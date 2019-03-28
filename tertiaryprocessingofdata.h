@@ -31,9 +31,13 @@ public:
     /// Возврат указателя на словарь поверхностных трасс
     inline QMap <int, Track>    *getSurfaceTracks();
 
+    /// Проверка на наличие обьектов для записи в БД
+    void getObjectsDb();
+
     /// Вычислительный процесс
     void                        run(const int _count, const float _currentTime);
-
+signals:
+    void signalInDb();
 private:
     /// Обновление словаря воздушных трасс
     void                            updateAirTracks();

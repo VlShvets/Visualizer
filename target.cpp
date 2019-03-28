@@ -57,31 +57,46 @@ int Target::getTrajectorySensCount(int _index) const
     return trajectory[_index].sensCount;
 }
 
+/// Получение ОГП точки траектории
+int Target::getTrajectoryOGP(int _index) const
+{
+    if(_index < 0 || _index > trajectory.count())
+        exit(1);
+
+    return trajectory[_index].OGP;
+}
 
 /// Установка символа Гипер Звукового Летательного аппарата (Hypersonic aircraft)
+
 void Target::setHA(float _x, float _y, float _alpha)
 {
-    setPoint(0, _x * scale, -_y * scale);
-    setPoint(1, _x * scale + XY_HA_LENGTH * qCos(_alpha), -(_y * scale + XY_HA_LENGTH * qSin(_alpha)));
-    setPoint(2, _x * scale - (0.5 * XY_HA_LENGTH) * qCos(_alpha - XY_HA_ANGLE),
-             -(_y * scale - (0.5 * XY_HA_LENGTH) * qSin(_alpha - XY_HA_ANGLE)));
-    setPoint(3, _x * scale + XY_HA_LENGTH * qCos(_alpha), -(_y * scale + XY_HA_LENGTH * qSin(_alpha)));
-    setPoint(4, _x * scale - (0.5 * XY_HA_LENGTH) * qCos(_alpha + XY_HA_ANGLE),
-             -(_y * scale - (0.5 * XY_HA_LENGTH) * qSin(_alpha + XY_HA_ANGLE)));
-    setPoint(5, _x * scale + XY_HA_LENGTH * qCos(_alpha), -(_y * scale + XY_HA_LENGTH * qSin(_alpha)));
+    int widthPix = 36;
+    int heightPix = 30;
+    pathImg = "HS";
+
+    setPoint(0, _x*scale - widthPix/2, - _y*scale - heightPix/2);
+    setPoint(1, _x*scale + widthPix/2, - _y*scale - heightPix/2);
+    setPoint(2, _x*scale - widthPix/2, - _y*scale + heightPix/2);
+    setPoint(3, _x*scale + widthPix/2, - _y*scale + heightPix/2);
+    setPoint(4, _x*scale - widthPix/2, - _y*scale - heightPix/2);
+    setPoint(5, _x*scale - widthPix/2, - _y*scale - heightPix/2);
 }
 
 /// Установка символа Баллистической Цели (Ballistic Goal)
 void Target::setBG(float _x, float _y, float _alpha)
 {
-    setPoint(0, _x * scale, -_y * scale);
-    setPoint(1, _x * scale + XY_BG_LENGTH * qCos(_alpha), -(_y * scale + XY_BG_LENGTH * qSin(_alpha)));
-    setPoint(2, _x * scale - (0.5 * XY_BG_LENGTH) * qCos(_alpha - XY_BG_ANGLE / 2.0),
-             -(_y * scale - (0.5 * XY_BG_LENGTH) * qSin(_alpha - XY_BG_ANGLE / 2.0)));
-    setPoint(3, _x * scale + XY_BG_LENGTH * qCos(_alpha), -(_y * scale + XY_BG_LENGTH * qSin(_alpha)));
-    setPoint(4, _x * scale - (0.5 * XY_BG_LENGTH) * qCos(_alpha + XY_BG_ANGLE / 2.0),
-             -(_y * scale - (0.5 * XY_BG_LENGTH) * qSin(_alpha + XY_BG_ANGLE / 2.0)));
-    setPoint(5, _x * scale + XY_BG_LENGTH * qCos(_alpha), -(_y * scale + XY_BG_LENGTH * qSin(_alpha)));
+
+    int widthPix = 50;
+    int heightPix = 50;
+    setRect(QRect(-widthPix/2, -heightPix/2, widthPix, heightPix));
+
+    setPoint(0, _x*scale - widthPix/2, - _y*scale - heightPix/2);
+    setPoint(1, _x*scale + widthPix/2, - _y*scale - heightPix/2);
+    setPoint(2, _x*scale - widthPix/2, - _y*scale + heightPix/2);
+    setPoint(3, _x*scale + widthPix/2, - _y*scale + heightPix/2);
+    setPoint(4, _x*scale - widthPix/2, - _y*scale - heightPix/2);
+    setPoint(5, _x*scale - widthPix/2, - _y*scale - heightPix/2);
+
 }
 
 /// Установка символа Крылатой Ракеты (Cruise Missile)
@@ -95,19 +110,22 @@ void Target::setCM(float _x, float _y, float _alpha)
     setPoint(4, _x * scale + (0.5 * XY_CM_LENGTH) * qCos(_alpha + XY_CM_ANGLE / 2.0),
              -(_y * scale + (0.5 * XY_CM_LENGTH) * qSin(_alpha + XY_CM_ANGLE / 2.0)));
     setPoint(5, _x * scale + XY_CM_LENGTH * qCos(_alpha), -(_y * scale + XY_CM_LENGTH * qSin(_alpha)));
+
 }
 
 /// Установка символа Стратегической Авиации (Strategic Aviation)
 void Target::setSA(float _x, float _y, float _alpha)
 {
-    setPoint(0, _x * scale, -_y * scale);
-    setPoint(1, _x * scale + XY_SA_LENGTH * qCos(_alpha), -(_y * scale + XY_SA_LENGTH * qSin(_alpha)));
-    setPoint(2, _x * scale + XY_SA_LENGTH * qCos(_alpha) - (0.5 * XY_SA_LENGTH) * qCos(_alpha - XY_SA_ANGLE / 2.0),
-             -(_y * scale + XY_SA_LENGTH * qSin(_alpha) - (0.5 * XY_SA_LENGTH) * qSin(_alpha - XY_SA_ANGLE / 2.0)));
-    setPoint(3, _x * scale + XY_SA_LENGTH * qCos(_alpha), -(_y * scale + XY_SA_LENGTH * qSin(_alpha)));
-    setPoint(4, _x * scale + XY_SA_LENGTH * qCos(_alpha) - (0.5 * XY_SA_LENGTH) * qCos(_alpha + XY_SA_ANGLE / 2.0),
-             -(_y * scale + XY_SA_LENGTH * qSin(_alpha) - (0.5 * XY_SA_LENGTH) * qSin(_alpha + XY_SA_ANGLE / 2.0)));
-    setPoint(5, _x * scale + XY_SA_LENGTH * qCos(_alpha), -(_y * scale + XY_SA_LENGTH * qSin(_alpha)));
+    int widthPix = 36;
+    int heightPix = 30;
+    pathImg = "SA";
+    setPoint(0, _x*scale - widthPix/2, -_y*scale - heightPix/4);
+    setPoint(1, _x*scale + widthPix/2, -_y*scale - heightPix/4);
+    setPoint(2, _x*scale + widthPix/2, -_y*scale + heightPix/4);
+    setPoint(3, _x*scale - widthPix/2, -_y*scale + heightPix/4);
+    setPoint(4, _x*scale - widthPix/2, -_y*scale - heightPix/4);
+    setPoint(5, _x*scale - widthPix/2, -_y*scale - heightPix/4);
+
 }
 
 /// Установка символа Надводной Цели (SEA)
@@ -123,19 +141,25 @@ void Target::setSEA(float _x, float _y, float _alpha)
              -(_y * scale + XY_SEA_LENGTH * qSin(_alpha) - (0.5 * XY_SEA_LENGTH) * qSin(_alpha + XY_SEA_ANGLE / 2.0)));
     setPoint(5, _x * scale - (0.5 * XY_SEA_LENGTH) * qCos(_alpha + XY_SEA_ANGLE / 4.0),
              -(_y * scale - (0.5 * XY_SEA_LENGTH) * qSin(_alpha + XY_SEA_ANGLE / 4.0)));
+
+    pathImg = "SEA";
+
 }
 
 /// Установка символа Наземной Цели (GROUND)
 void Target::setGROUND(float _x, float _y, float _alpha)
 {
-    setPoint(0, _x * scale, -_y * scale);
-    setPoint(1, _x * scale + XY_GROUND_LENGTH * qCos(_alpha) / 2.0, -(_y * scale + XY_GROUND_LENGTH * qSin(_alpha) / 2.0));
-    setPoint(2, _x * scale, -_y * scale);
-    setPoint(3, _x * scale - (0.5 * XY_GROUND_LENGTH) * qCos(_alpha - XY_GROUND_ANGLE / 2.0),
-             -(_y * scale - (0.5 * XY_GROUND_LENGTH) * qSin(_alpha - XY_GROUND_ANGLE / 2.0)));
-    setPoint(4, _x * scale, -_y * scale);
-    setPoint(5, _x * scale - (0.5 * XY_GROUND_LENGTH) * qCos(_alpha + XY_GROUND_ANGLE / 2.0),
-             -(_y * scale - (0.5 * XY_GROUND_LENGTH) * qSin(_alpha + XY_GROUND_ANGLE / 2.0)));
+    pathImg = "PANZER";
+    int widthPix = 50;
+    int heightPix = 50;
+
+    setPoint(0, _x*scale - widthPix/2, -_y*scale - heightPix/4);
+    setPoint(1, _x*scale + widthPix/2, -_y*scale - heightPix/4);
+    setPoint(2, _x*scale + widthPix/2, -_y*scale + heightPix/4);
+    setPoint(3, _x*scale - widthPix/2, -_y*scale + heightPix/4);
+    setPoint(4, _x*scale - widthPix/2, -_y*scale - heightPix/4);
+    setPoint(5, _x*scale - widthPix/2, -_y*scale - heightPix/4);
+
 }
 
 /// Класс параметров эталонов
@@ -220,18 +244,6 @@ bool Etalon::containsPoint(const QPoint &_pt, Qt::FillRule _fillRule) const
 {
     QPolygon temp(*(dynamic_cast <const QPolygon *> (this)));
 
-    if(tPubEtalon != nullptr && tPubEtalon->ObjClass == UOC_AIR)
-    {
-        temp.remove(1);
-        temp.remove(4);
-    }
-    else if(tPubEtalon != nullptr && tPubEtalon->ObjClass == UOC_GROUND)
-    {
-        temp.remove(0);
-        temp.remove(1);
-        temp.remove(2);
-    }
-
     return temp.containsPoint(_pt, _fillRule);
 }
 
@@ -279,6 +291,7 @@ void Track::saveTrack()
     temp.h = tGenTrc->h;
     temp.time = tGenTrc->tHUpdate;
     temp.sensCount = tGenTrc->sensCount;
+    temp.OGP = tGenTrc->OGP;
     trajectory.push_front(temp);
 
     /// Проверка предельного количества точек в траектории

@@ -22,7 +22,10 @@ MainWindow::MainWindow(QWidget *_parent)
     painter         = new Painter(aboutEtalon, aboutTrack, graphHeight);
     settings        = new Settings(painter);
     status          = new Status;
-    playPause       = new PlayPause(painter, status);
+    //exp
+    dataBaseWidget  = new DataBaseWidget();
+    //exp
+    playPause       = new PlayPause(painter, status, dataBaseWidget);
 
     /// Виджет отрисовки эталонов и трасс
     setCentralWidget(painter);
@@ -33,18 +36,34 @@ MainWindow::MainWindow(QWidget *_parent)
     tPlayPause->setMovable(false);
     addToolBar(tPlayPause);
 
+
+    QToolBar *flagDb = new QToolBar(tr("База данных"), this);
+    QCheckBox *check = new QCheckBox(tr("База данных"));
+    check->setChecked(false);
+    connect(check, SIGNAL(clicked(bool)), dataBaseWidget, SLOT(show_hide(bool)));
+    flagDb->addWidget(check);
+    flagDb->setMovable(false);
+    addToolBar(flagDb);
+
     /// Виджет настроек отображения
     QToolBar *tSettings = new QToolBar(tr("Настройки"), this);
     tSettings->addWidget(settings);
     tSettings->setMovable(false);
     addToolBar(tSettings);
 
+
+
     /// Виджет отображения графика высоты
     QDockWidget *dGraphHeight = new QDockWidget(tr("График высоты"), this);
     dGraphHeight->setWidget(graphHeight);
     dGraphHeight->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::LeftDockWidgetArea, dGraphHeight);
-
+//    dGraphHeight->setWidget(dataBaseWidget);
+    dataBaseWidget->show();
+//    dataBaseWidget->hide();
+    dGraphHeight->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::LeftDockWidgetArea, dGraphHeight);
+//    dataBaseWidget->
     /// Виджет отображения параметров эталонов
     QDockWidget *dAboutEtalon = new QDockWidget(tr("Информация об эталоне"), this);
     dAboutEtalon->setWidget(aboutEtalon);
@@ -59,6 +78,8 @@ MainWindow::MainWindow(QWidget *_parent)
 
     /// Виджет отображения текущего состояния потока вычислений
     statusBar()->addWidget(status);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -70,6 +91,7 @@ MainWindow::~MainWindow()
     delete graphHeight;
     delete aboutTrack;
     delete aboutEtalon;
+    delete dataBaseWidget;
 }
 
 }

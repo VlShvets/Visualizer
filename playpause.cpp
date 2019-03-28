@@ -4,8 +4,8 @@ namespace Visualizer
 {
 
 /// Класс виджета управления потоком вычислений
-PlayPause::PlayPause(Painter *_painter, Status *_status, QWidget *_parent)
-    :QWidget(_parent), painter(_painter), status(_status), mainThread(nullptr)
+PlayPause::PlayPause(Painter *_painter, Status *_status, DataBaseWidget * _dataBaseWidget, QWidget *_parent)
+    :QWidget(_parent), painter(_painter), status(_status), mainThread(nullptr), dataBaseWidget(_dataBaseWidget)
 {
     QHBoxLayout *hLayout = new QHBoxLayout(this);
 
@@ -52,15 +52,18 @@ PlayPause::PlayPause(Painter *_painter, Status *_status, QWidget *_parent)
     this->setLayout(hLayout);
 
     createOfThread();
+    //createOfThreadDb();
 }
 
 PlayPause::~PlayPause()
 {
     delete pPlayPause;
     delete cSleepTime;
+    delete dataBaseWidget;
 
     /// Завершение имеющегося потока вычислений
     completeOfThread();
+
 }
 
 /// Перезапуск потока вычислений
@@ -114,13 +117,23 @@ void PlayPause::stop()
     pPlayPause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 }
 
+///Поток проверки и записи базы данных
+//void PlayPause::createOfThreadDb()
+//{
+//    if(dbThread != nullptr)
+//        return;
+
+//    dbThread = new DbThread(dataBaseWidget);
+//    dbThread->start();
+//}
+
 /// Создание нового потока вычислений
 void PlayPause::createOfThread()
 {
     if(mainThread != nullptr)
         return;
 
-    mainThread = new MainThread(painter, status, cSleepTime->currentText());
+    mainThread = new MainThread(painter, status, dataBaseWidget, cSleepTime->currentText());
     QObject::connect(cSleepTime, SIGNAL(activated(QString)), mainThread, SLOT(setSleepTime(QString)));
     mainThread->start();
 }
@@ -135,6 +148,10 @@ void PlayPause::completeOfThread()
     mainThread->wait();
     delete mainThread;
     mainThread = nullptr;
+
+    //mainThread->completeOfThreadDb();
+
 }
+
 
 }

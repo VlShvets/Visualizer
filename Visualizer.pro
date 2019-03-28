@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += xml
+QT       += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -53,7 +54,9 @@ SOURCES += \
     tertiaryprocessingofdata.cpp \
     imitation.cpp \
     settings.cpp \
-    preliminaryprocessingofdata.cpp
+    preliminaryprocessingofdata.cpp \
+    dbthread.cpp \
+    databasewidget.cpp
 
 HEADERS +=\
     painter.h \
@@ -69,7 +72,9 @@ HEADERS +=\
     tertiaryprocessingofdata.h \
     imitation.h \
     settings.h \
-    preliminaryprocessingofdata.h
+    preliminaryprocessingofdata.h \
+    dbthread.h \
+    databasewidget.h
 
 unix {
     target.path = /usr/lib

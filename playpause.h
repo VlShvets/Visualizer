@@ -1,6 +1,7 @@
 #ifndef PLAYPAUSE_H
 #define PLAYPAUSE_H
 
+#include "dbthread.h"
 #include "mainthread.h"
 #include "painter.h"
 #include "status.h"
@@ -12,6 +13,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QStringList>
+#include <databasewidget.h>
 
 namespace Visualizer
 {
@@ -22,7 +24,7 @@ class PlayPause : public QWidget
     Q_OBJECT
 
 public:
-    explicit    PlayPause(Painter *_painter, Status *_status, QWidget *_parent = nullptr);
+    explicit    PlayPause(Painter *_painter, Status *_status, DataBaseWidget * _dataBaseWidget, QWidget *_parent = nullptr);
     ~PlayPause();
 
 private slots:
@@ -36,6 +38,8 @@ private slots:
     void        stop();
 
 private:
+//    void        createOfThreadDb();
+
     /// Создание нового потока вычислений
     void        createOfThread();
 
@@ -57,6 +61,10 @@ private:
     Painter         *painter;       /// Класс виджета отрисовки эталонов и трасс
     Status          *status;        /// Класс виджета отображения текущего состояния потока вычислений
     MainThread      *mainThread;    /// Класс главного потока вычислений
+
+    //exp
+    DbThread        *dbThread;
+    DataBaseWidget  *dataBaseWidget;
 };
 
 }

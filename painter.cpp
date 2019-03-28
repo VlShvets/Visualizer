@@ -331,7 +331,12 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
     p.scale(getCSAbsScale(), getCSOrdScale());
 
     /// Карта
-    QPixmap map(":/map/0.jpg");
+    QPixmap map;
+    bool mapload = map.load(":/map/0.jpg");
+    if(!mapload){
+        map.load(":/map/12.jpg");
+    }
+
     p.save();
     p.scale(1.0, -1.0);
     p.drawPixmap(QRect(- map.width() / 2.0 * 75.0 - 456125.0, - map.height() / 2.0 * 75.0 + 327075.0, map.width() * 75.0, map.height() * 75.0), map);
@@ -441,14 +446,19 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
 
     /// --------------------------------------------------
 
+    QPixmap pxm;
+    QRect rct;
+
     /// Эталоны
 
     if(etalons != nullptr && isVisibleOfEtalons)
     {
+
         QMap <int, Etalon>::const_iterator etalon = etalons->constBegin();
         for(; etalon != etalons->constEnd(); ++etalon)
         {
-            if(etalon.value().getTPubEtalon() != nullptr)
+            TPubEtalon *p_TPubEtalon = etalon.value().getTPubEtalon();
+            if(p_TPubEtalon != nullptr)
             {
                 /// Отрисовка траекторий
                 if(isVisibleOfTrajectories)
@@ -472,24 +482,31 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
 
                 p.scale(1.0 / getCSAbsScale(), 1.0 / getCSOrdScale());
 
-                /// Отрисовка выделения при выборе
-                if(etalon.key() == numberSelectedEtalon)
-                {
-                    p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
-                    p.drawPolygon(etalon.value());
-                }
-
-                /// Отрисовка выделения при наведении
-                if(etalon.key() == numberHighlightedEtalon)
-                {
-                    p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
-                    p.drawPolygon(etalon.value());
-                }
-
                 p.setPen(QPen(Qt::GlobalColor(CLR_ETALON), WDT_ARROW));
-                p.drawPolygon(etalon.value());
 
+                p.save();
+                pen.setWidth(5);
+                pen.setColor(Qt::green);
+                p.setPen(pen);
+
+                ///Отрисовка картинок
+
+                p.translate(p_TPubEtalon->y*getCSAbsScale(), p_TPubEtalon->x*(getCSOrdScale()));
+                p.rotate(5 - 180/M_PI*qAtan2(p_TPubEtalon->vx, p_TPubEtalon->vy));
+
+                if(etalon.key() != numberHighlightedEtalon && etalon.key() != numberSelectedEtalon){
+                    pxm.load(":/pic/foto/" + etalon.value().getPathImg() + "_Etalon.png");
+                }else{
+                    pxm.load(":/pic/foto/" + etalon.value().getPathImg() + "_Click.png");
+                }
+
+                rct.setRect(-pxm.width()/12, -pxm.height()/12, pxm.width()/6, pxm.height()/6);
+                //etalon.value().load(":/pic/foto/" + etalon.value().getPathImg() + "_Etalon.png");
+                //p.drawPixmap(rct, pxm);
+                p.drawPixmap(rct, etalon.value());
+                p.restore();
                 p.scale(getCSAbsScale(), getCSOrdScale());
+
             }
         }
     }
@@ -500,9 +517,12 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
 
     if(airTracks != nullptr && isVisibleOfAirTracks)
     {
+
         QMap <int, Track>::const_iterator airTrack = airTracks->constBegin();
         for(; airTrack != airTracks->constEnd(); ++airTrack)
         {
+            QString pathImg = "";
+
             if(airTrack.value().getTGenTrc() != nullptr)
             {
                 if(!isVisibleOfGroupLeaders || airTrack.value().getTGenTrc()->grpInfo.trcCount > 0)
@@ -553,17 +573,16 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
                             if(airTrack.value().getTGenTrc()->OGP == 1)
                             {
                                 if(airTrack.value().getTrajectorySensCount(j) > 1.0)
-                                    pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));
+                                    pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));   //Синий
                                 else
-                                    pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));
-                            }
-                            else
-                            {
+                                    pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));        //Темно-синий
+                            }else{
                                 if(airTrack.value().getTrajectorySensCount(j) > 1.0)
-                                    pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));
+                                    pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));   //Красный
                                 else
-                                    pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));
+                                    pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));        //Темно-красный
                             }
+
                             pen.setWidth(WDT_TRAJECTORY_POINT);
                             p.setPen(pen);
                             p.drawPoint(airTrack.value().getTrajectoryCoord(j));
@@ -587,39 +606,67 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
                         p.drawText(airTrack.value().at(0) - QPoint(20, 5), str);
                     }
 
-                    /// Отрисовка выделения при выборе
-                    if(airTrack.key() == numberSelectedTrack)
-                    {
-                        p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
-                        p.drawPolygon(airTrack.value());
-                    }
+//                    /// Отрисовка выделения при выборе
+//                    if(airTrack.key() == numberSelectedTrack)
+//                    {
+//                        p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
+//                        p.drawPolygon(airTrack.value());
+//                    }
 
-                    /// Отрисовка выделения при наведении
-                    if(airTrack.key() == numberHighlightedTrack)
-                    {
-                        p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
-                        p.drawPolygon(airTrack.value());
-                    }
+//                    /// Отрисовка выделения при наведении
+//                    if(airTrack.key() == numberHighlightedTrack)
+//                    {
+//                        p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
+//                        p.drawPolygon(airTrack.value());
+//                    }
 
                     if(airTrack.value().getTGenTrc()->OGP == 1)
                     {
-                        if(airTrack.value().getTGenTrc()->sensCount > 1.0)
+                        pathImg += ANOTHERS;
+                        if(airTrack.value().getTGenTrc()->sensCount > 1.0){
                             pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));
-                        else
+                            pathImg += MANY;
+                        }else{
                             pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));
+                            pathImg += ONE;
+                            }
                     }
                     else
                     {
-                        if(airTrack.value().getTGenTrc()->sensCount > 1.0)
+                        pathImg += OUR;
+                        if(airTrack.value().getTGenTrc()->sensCount > 1.0){
                             pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));
-                        else
+                            pathImg += MANY;
+                        }else{
                             pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));
+                            pathImg += ONE;
+                            }
                     }
 
                     pen.setWidth(WDT_ARROW);
                     p.setPen(pen);
-                    p.drawPolygon(airTrack.value());
+                    //p.drawPolygon(airTrack.value());
 
+                    /// Change code Block
+                    p.save();
+                    p.translate(airTrack.value().getTGenTrc()->y*getCSAbsScale(), airTrack.value().getTGenTrc()->x*(getCSOrdScale()));
+                    p.rotate(5 - 180/M_PI*qAtan2(airTrack.value().getTGenTrc()->vX, airTrack.value().getTGenTrc()->vY));
+                    //qDebug()<<"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC:"<<airTrack.value().getTGenTrc()->y*getCSAbsScale()<<airTrack.value().getTGenTrc()->x*(getCSOrdScale());
+
+                    if(airTrack.key() != numberHighlightedTrack && airTrack.key() != numberSelectedTrack){
+                        pxm.load(":/pic/foto/" + airTrack.value().getPathImg() + pathImg + ".png");
+                        //pxm.load(":/pic/foto/SA_Etalon.png");
+                    }else{
+                        pxm.load(":/pic/foto/" + airTrack.value().getPathImg() + "_Click.png");
+                        //pxm.load(":/pic/foto/SA_Click.png");
+                    }
+                    //qDebug()<<":/pic/foto/" + airTrack.value().getPathImg() + pathImg + ".png";
+                    //qDebug()<<":/pic/foto/" + airTrack.value().getPathImg() + pathImg + ".png";
+                    rct = QRect(-pxm.width()/12, -pxm.height()/12, pxm.width()/6, pxm.height()/6);
+                    p.drawPixmap(rct, pxm);
+                    //p.drawRect(-30, -30, 60, 60);
+                    ///endChange Block code
+                    p.restore();
                     p.scale(getCSAbsScale(), getCSOrdScale());
                 }
             }
@@ -632,9 +679,11 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
 
     if(surfaceTracks != nullptr && isVisibleOfSurfaceTracks)
     {
+
         QMap <int, Track>::const_iterator surfaceTrack = surfaceTracks->constBegin();
         for(; surfaceTrack != surfaceTracks->constEnd(); ++surfaceTrack)
         {
+            QString pathImg = "";
             if(surfaceTrack.value().getTGenTrc() != nullptr)
             {
                 if(!isVisibleOfGroupLeaders || surfaceTrack.value().getTGenTrc()->grpInfo.trcCount > 0)
@@ -726,6 +775,10 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
                             p.setPen(QPen(Qt::GlobalColor(CLR_FR_TRACK)));
                     }
 
+
+
+
+
                     p.drawPoint(surfaceTrack.value().at(0));
 
                     /// Отрисовка лидеров групп
@@ -736,38 +789,83 @@ void Painter::paintEvent(QPaintEvent *_pEvent)
                         p.drawText(surfaceTrack.value().at(0) - QPoint(20, 5), str);
                     }
 
-                    /// Отрисовка выделения при выборе
-                    if(surfaceTrack.key() == numberSelectedTrack - 1000)
-                    {
-                        p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
-                        p.drawPolygon(surfaceTrack.value());
-                    }
+//                    /// Отрисовка выделения при выборе
+//                    if(surfaceTrack.key() == numberSelectedTrack - 1000)
+//                    {
+//                        p.setPen(QPen(Qt::GlobalColor(CLR_SELECT), WDT_SELECT));
+//                        p.drawPolygon(surfaceTrack.value());
+//                    }
 
-                    /// Отрисовка выделения при наведении
-                    if(surfaceTrack.key() == numberHighlightedTrack - 1000)
-                    {
-                        p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
-                        p.drawPolygon(surfaceTrack.value());
-                    }
+//                    /// Отрисовка выделения при наведении
+//                    if(surfaceTrack.key() == numberHighlightedTrack - 1000)
+//                    {
+//                        p.setPen(QPen(Qt::GlobalColor(CLR_HIGHLIGHT), WDT_HIGHLIGHT));
+//                        p.drawPolygon(surfaceTrack.value());
+//                    }
+
+//                    if(surfaceTrack.value().getTGenTrc()->OGP == 1)
+//                    {
+//                        if(surfaceTrack.value().getTGenTrc()->sensCount > 1.0)
+//                            pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));
+//                        else
+//                            pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));
+//                    }
+//                    else
+//                    {
+//                        if(surfaceTrack.value().getTGenTrc()->sensCount > 1.0)
+//                            pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));
+//                        else
+//                            pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));
+//                    }
 
                     if(surfaceTrack.value().getTGenTrc()->OGP == 1)
                     {
-                        if(surfaceTrack.value().getTGenTrc()->sensCount > 1.0)
+                        pathImg += ANOTHERS;
+                        if(surfaceTrack.value().getTGenTrc()->sensCount > 1.0){
                             pen.setColor(Qt::GlobalColor(CLR_TRUE_AL_TRACK));
-                        else
+                            pathImg += MANY;
+                        }else{
                             pen.setColor(Qt::GlobalColor(CLR_AL_TRACK));
+                            pathImg += ONE;
+                            }
                     }
                     else
                     {
-                        if(surfaceTrack.value().getTGenTrc()->sensCount > 1.0)
+                        pathImg += OUR;
+                        if(surfaceTrack.value().getTGenTrc()->sensCount > 1.0){
                             pen.setColor(Qt::GlobalColor(CLR_TRUE_FR_TRACK));
-                        else
+                            pathImg += MANY;
+                        }else{
                             pen.setColor(Qt::GlobalColor(CLR_FR_TRACK));
+                            pathImg += ONE;
+                            }
                     }
 
                     pen.setWidth(WDT_ARROW);
                     p.setPen(pen);
-                    p.drawPolygon(surfaceTrack.value());
+                    //p.drawPolygon(surfaceTrack.value());
+
+                    /// Change code Block
+                    p.save();
+                    p.translate(surfaceTrack.value().getTGenTrc()->y*getCSAbsScale(), surfaceTrack.value().getTGenTrc()->x*(getCSOrdScale()));
+                    p.rotate(5 - 180/M_PI*qAtan2(surfaceTrack.value().getTGenTrc()->vX, surfaceTrack.value().getTGenTrc()->vY));
+                    //qDebug()<<"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC:"<<airTrack.value().getTGenTrc()->y*getCSAbsScale()<<airTrack.value().getTGenTrc()->x*(getCSOrdScale());
+
+                    if(surfaceTrack.key() != numberHighlightedTrack - 1000 && surfaceTrack.key() != numberSelectedTrack - 1000){
+                        pxm.load(":/pic/foto/" + surfaceTrack.value().getPathImg() + pathImg + ".png");
+                        //pxm.load(":/pic/foto/SA_Etalon.png");
+                    }else{
+                        pxm.load(":/pic/foto/" + surfaceTrack.value().getPathImg() + "_Click.png");
+                        //pxm.load(":/pic/foto/SA_Click.png");
+                    }
+
+
+                    rct = QRect(-pxm.width()/12, -pxm.height()/12, pxm.width()/6, pxm.height()/6);
+                    p.drawPixmap(rct, pxm);
+                    //p.drawRect(-30, -30, 60, 60);
+                    ///endChange Block code
+                    p.restore();
+
 
                     p.scale(getCSAbsScale(), getCSOrdScale());
                 }
