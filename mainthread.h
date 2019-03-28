@@ -4,11 +4,13 @@
 #include "painter.h"
 #include "status.h"
 
+#include "dbthread.h"
 #include "imitation.h"
 #include "preliminaryprocessingofdata.h"
 #include "tertiaryprocessingofdata.h"
 
 #include <QThread>
+#include <databasewidget.h>
 
 namespace Visualizer
 {
@@ -19,7 +21,7 @@ class MainThread : public QThread
     Q_OBJECT
 
 public:
-    explicit    MainThread(Painter *_painter, Status *_status, const QString _deltaTime);
+    explicit    MainThread(Painter *_painter, Status *_status,DataBaseWidget *_dataBaseWidget, const QString _deltaTime); //
     ~MainThread();
 
     /// Поток вычислений
@@ -34,6 +36,9 @@ public:
     /// Передача информации в строку состояния
     inline void     sendToStatus(TypeOfInfo _typeOfInfo, double _info);
 
+    void            completeOfThreadDb();
+signals:
+    void signalInDb(int, int, int, int);
 public slots:
     /// Завершение потока вычислений
     inline void     complete();
@@ -52,6 +57,8 @@ private:
     Imitation                   *imitation;                     /// Указатель на объект класса внутренней имитации
     PreliminaryProcessingOfData *preliminaryProcessingOfData;   /// Указатель на объект класса внутренней предварительной обработки информации
     TertiaryProcessingOfData    *tertiaryProcessingOfData;      /// Указатель на объект класса внутренней третичной обработки информации
+    DbThread                    *dbThread;
+    DataBaseWidget              *dataBaseWidget;
 
     /// --------------------------------------------------
     /// Переменные
@@ -76,10 +83,13 @@ private:
     static constexpr float  DELTA_T = 1.0;      /// Интервал времени ожидания между итерациями потока вычислний     (в мс)
 };
 
-/// Установление флага приостановления потока вычислений
+/// Установка флага приостановления потока вычислений
 void MainThread::setPause(const bool _pause)
 {
     isPause = _pause;
+
+    //Time redaction
+    dbThread->setPause(_pause);
 }
 
 /// Возвращение флага приостановления потока вычислений
@@ -98,6 +108,9 @@ void MainThread::sendToStatus(TypeOfInfo _typeOfInfo, double _info)
 void MainThread::complete()
 {
     isCompleted = true;
+
+    //Time redaction
+    dbThread->setComplited(true);
 }
 
 /// Установление времени между итерациями потока вычислений

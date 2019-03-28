@@ -19,5 +19,32 @@
         <file>pic/fr/sh/3.png</file>
         <file>pic/fr/tn/0.png</file>
         <file>map/0.jpg</file>
+        <file>pic/foto/SA_Chuj_Many.png</file>
+        <file>pic/foto/SA_Chuj_One.png</file>
+        <file>pic/foto/SA_Click.png</file>
+        <file>pic/foto/SA_Etalon.png</file>
+        <file>pic/foto/SA_NO.png</file>
+        <file>pic/foto/SA_Svoi_Many.png</file>
+        <file>pic/foto/SA_Svoi_One.png</file>
+        <file>pic/foto/PANZER_Click.png</file>
+        <file>pic/foto/SEA_Click.png</file>
+        <file>pic/foto/PANZER_Etalon.png</file>
+        <file>pic/foto/SEA_Etalon.png</file>
+        <file>pic/foto/HS_Chuj_Many.png</file>
+        <file>pic/foto/HS_Chuj_One.png</file>
+        <file>pic/foto/HS_Click.png</file>
+        <file>pic/foto/HS_Etalon.png</file>
+        <file>pic/foto/HS_NO.png</file>
+        <file>pic/foto/HS_Svoi_Many.png</file>
+        <file>pic/foto/HS_Svoi_One.png</file>
+        <file>pic/foto/PANZER_Chuj_Many.png</file>
+        <file>pic/foto/PANZER_Chuj_One.png</file>
+        <file>pic/foto/PANZER_Svoi_Many.png</file>
+        <file>pic/foto/PANZER_Svoi_One.png</file>
+        <file>pic/foto/SEA_Chuj_Many.png</file>
+        <file>pic/foto/SEA_Chuj_One.png</file>
+        <file>pic/foto/SEA_Svoi_Many.png</file>
+        <file>pic/foto/SEA_Svoi_One.png</file>
+        <file>map/12.jpg</file>
     </qresource>
 </RCC>

@@ -4,6 +4,7 @@
 #include "aboutetalon.h"
 #include "abouttrack.h"
 #include "graphheight.h"
+#include <QDebug>
 
 namespace Visualizer
 {
@@ -116,6 +117,7 @@ private:
     int     numberSelectedEtalon;       /// Номер выбранного эталона
     int     numberHighlightedTrack;     /// Номер выделенной трассы
     int     numberSelectedTrack;        /// Номер выбранной трассы
+
 };
 
 /// Установка флага отображения зон видимости

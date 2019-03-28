@@ -11,6 +11,10 @@
 #include <QToolBar>
 #include <QDockWidget>
 #include <QStatusBar>
+#include <databasewidget.h>
+#include <QCheckBox>
+
+#include <QtWidgets>
 
 namespace Visualizer
 {
@@ -34,6 +38,8 @@ private:
     Settings        *settings;      /// Класс виджета настроек отображения
     Status          *status;        /// Класс виджета отображения текущего состояния потока вычислений
     PlayPause       *playPause;     /// Класс виджета управления потоком вычислений
+
+    DataBaseWidget  *dataBaseWidget; /// Class of working with DataBases
 };
 
 }
